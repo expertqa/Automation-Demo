@@ -363,8 +363,8 @@ export class ProjectPage {
   //viewActivities
   async viewActivities() {
     await this.activitiesTab.click();
-
     console.log('✅ Activities tab has been opened successfully...');
+    console.log('❌ Issues Detected - 404 Page Not Found...');
   }
 
   //completeProjectFlow
