@@ -1,0 +1,419 @@
+import {generateRandomName} from '../utils/helper.js';
+const { expect } = require('@playwright/test');
+
+
+
+class IdeaPage {
+  constructor(page) {
+    this.page = page;
+
+    // Create Idea
+this.addIdeaButton = page.getByRole('button', { name: 'Add idea' });
+this.enterManuallyButton = page.getByRole('button', { name: 'Enter manually' });
+this.ideaTitleTextbox = page.getByRole('textbox', {
+  name: 'Title'
+});
+this.ideaDesBox = page.getByRole('dialog', { name: 'Edit title & description' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+this.crossIcon = page.getByRole('button', { name: 'Close' });
+
+// Details
+this.detailsTab = page.getByRole('tab', { name: 'Details' });
+this.departmentButton = page.getByRole('button', {
+  name: 'Select department'
+});
+this.generalDepartment = page.getByRole('button', {
+  name: /General/
+});
+
+this.detailsNote = page.getByRole('tabpanel', { name: 'Details' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+
+
+// Work
+this.workTab = page.getByRole('tab', { name: 'Work' });
+this.addTaskBtn = page.getByRole('button', { name: 'Add task' });
+this.taskTitle = page.getByRole('textbox', { name: 'Title' });
+this.addPhase = page.getByRole('textbox', { name: 'Phase' });
+this.addDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+
+// Canvas
+this.canvasButton = page.locator('button').filter({ hasText: /^Canvases/ });
+this.publishButton = page.getByRole('button', { name: 'Publish' });
+this.filenameTextbox = page.getByRole('textbox', { name: 'Filename' });
+this.msgBox = page.getByRole('textbox', { name: 'Status message' });
+
+// Problems
+this.problemsButton = page.getByRole('button', { name: 'Problems' });
+this.addProblemButton = page.locator('button').filter({
+  hasText: /^Add problem$/
+});
+this.problemTextbox = page.getByRole('textbox', {
+  name: 'Short problem name'
+});
+this.problemUser = page.getByRole('textbox', { name: 'Who is impacted?' });
+this.problemStatemnt = page.getByRole('textbox', { name: 'What is happening, for who,' });
+this.problemEvidence = page.getByRole('textbox', { name: 'Metrics, quotes, incidents' });
+// Assumptions
+this.assumptionsButton = page.getByRole('button', {
+  name: 'Assumptions'
+});
+this.addAssumptionButton = page.locator('button').filter({ hasText: /^Add assumption$/ });
+
+// Experiments
+this.experimentsButton = page.getByRole('button', {  name: 'Experiments' });
+this.addExperimentButton = page.getByRole('button', { name: 'Add Experiment', exact: true });
+this.hypothesis = page.locator('div').filter({ hasText: /^Hypothesis/ }).locator('textarea').first();
+this.method = page.locator('div').filter({ hasText: /^Method/ }).locator('textarea').first();
+this.successMetric = page.locator('div').filter({ hasText: /^Success metric/ }).locator('textarea').first();
+this.outcomeSummary = page.locator('div').filter({ hasText: /^Outcome summary/ }).locator('textarea').first();
+this.exDecision = page.locator('div').filter({ hasText: /^Decision/ }).locator('textarea').first();
+this.exNotes = page.locator('div').filter({ hasText: /^Notes/ }).locator('textarea').first();
+
+// Risks
+this.risksButton = page.getByRole('button', { name: 'Risks' });
+this.addRiskButton = page.locator('button').filter({ hasText: /^Add risk$/ });
+this.riskTitle = page.getByRole('textbox').first();
+this.riskMitigation = page.getByRole('textbox', { name: 'Describe the mitigation' });
+this.notesField = this.page.getByRole('textbox', { name: 'Add context or follow ups' });
+
+// Decisions
+this.decisionsButton = page.getByRole('button', {
+  name: 'Decisions'
+});
+this.addDecisionButton = page.locator('button').filter({
+  hasText: /^Add decision$/
+});
+this.addDecisionTitle = page.getByRole('textbox', { name: 'Decision title' });
+this.addDecisionDescription = page.getByRole('textbox', { name: 'What was decided' });
+this.addDecisionRationale = page.getByRole('textbox', { name: 'Why this was the right' });
+this.addDecisionAlternatives = page.getByRole('textbox', { name: 'Alternatives considered' });
+this.addDecisionNotes = page.getByRole('textbox', { name: 'Next steps' });
+this.UpdateDecisionBtn = page.getByRole('button', { name: 'Update decision' });
+
+// Lessons
+this.lessonsButton = page.getByRole('button', { name: 'Lessons' });
+this.addLessonButton = page.locator('button').filter({ hasText: /^Add lesson$/ });
+this.addLessonTitle = page.getByRole('textbox', { name: 'Lesson title' });
+this.addLessonSummary = page.getByRole('textbox', { name: 'Short summary' });
+this.addLessonLearn = page.getByRole('textbox', { name: 'What did we learn' });
+this.addLessoncontext = page.getByRole('textbox', { name: 'Where did this happen' });
+this.addLessonworked = page.getByRole('textbox', { name: 'What worked well' });
+this.addLessonNotWorked = page.getByRole('textbox', { name: 'What did not work' });
+this.addLessonRecommen = page.getByRole('textbox', { name: 'What should others do' });
+this.updateLessonBtn = page.getByRole('button', { name: 'Update lesson' });
+
+// this.hideLessonDialog = page.getByRole('dialog').filter({ hasText: 'Add lesson' });
+
+
+// Team
+this.teamButton = page.getByText('Team');
+
+this.addTeamButton = page.locator('div').filter({ hasText: /^Team members\s*\d/ }).getByRole('button', { name: 'Add' });
+
+this.selectUserButton = page.locator('button[data-slot="popover-trigger"]').filter({ hasText: 'Select a user' });
+this.addMember = page.getByLabel('Suggestions').getByText('Muhammad SQA8');
+
+
+// Links
+this.addLinkdropdown = page.locator('div').filter({ hasText: /^Links/ }).getByRole('button', { name: 'Add' }).first()
+this.addLinkBtn = page.getByRole('button', { name: 'Add link' })
+this.linkTitleTextbox = page.getByRole('textbox', { name: 'Title of the link' });
+this.linkUrlTextbox = page.getByRole('textbox', { name: 'https://' });
+this.addLinkBtn2 = page.getByRole('button', { name: 'Add link' }).nth(1);
+
+//Back to funnel
+this.FunnelBack = page.getByRole('link', { name: 'Back to funnel' });
+
+  }
+
+//createIdea Method
+async createIdea() {
+  const ideaName = generateRandomName('Idea');
+  const ideaDescription = generateRandomName('IdeaDes');
+
+  await this.addIdeaButton.waitFor({ state: 'visible', timeout: 30000 });
+  await this.addIdeaButton.click();
+
+  await this.enterManuallyButton.waitFor({ state: 'visible', timeout: 30000 });
+  await this.enterManuallyButton.click();
+
+  await this.ideaTitleTextbox.waitFor({ state: 'visible', timeout: 30000 });
+  await this.ideaTitleTextbox.fill(ideaName);
+
+  await this.ideaDesBox.fill(ideaDescription);
+
+  await this.crossIcon.click();
+
+  console.log('✅ Idea has been created successfully...');
+
+  return { ideaName, ideaUrl: this.page.url() };
+}
+
+//fillDetailsSection
+async fillDetailsSection() {
+  const detailsNote = generateRandomName('Note');
+  await this.detailsTab.click();
+
+  await this.departmentButton.click();
+
+  await this.generalDepartment.click();
+
+  await this.detailsNote.click();
+  await this.detailsNote.fill(detailsNote);
+
+  console.log('✅ Details section has been filled successfully...');
+}
+
+//addTask
+async addTask() {
+  const taskTitle = generateRandomName('Task');
+  const taskPhase = generateRandomName('Phase');
+  const taskDescription = generateRandomName('Description');
+
+  await this.workTab.click();
+
+  await this.addTaskBtn.first().click();
+
+  await this.taskTitle.fill(taskTitle);
+
+  await this.addPhase.fill(taskPhase);
+
+  await this.addDescription.fill(taskDescription);
+
+  await this.addTaskBtn.click();
+
+  console.log('✅ Task has been added successfully...');
+}
+
+//publishCanvas
+async publishCanvas() {
+  const canvasFilename = generateRandomName('Canvas');
+  const canvasMessage = generateRandomName('Message');
+
+  await this.canvasButton.click();
+
+  await this.publishButton.waitFor({ state: 'visible' });
+  await this.publishButton.click();
+
+  await this.filenameTextbox.waitFor({ state: 'visible' });
+  await this.filenameTextbox.fill(canvasFilename);
+  await this.msgBox.fill(canvasMessage);
+
+  await this.publishButton.click();
+  await this.filenameTextbox.waitFor({ state: 'hidden', timeout: 30000 });
+
+  console.log('✅ Canvas has been published successfully...');
+}
+
+//addProblem
+async addProblem() {
+  const problemName = generateRandomName('Problem');
+  const problemUser = generateRandomName('User');
+  const problemStatement = generateRandomName('Statement');
+  const problemEvidence = generateRandomName('Evidence');
+
+  await this.problemsButton.click();
+
+  await this.addProblemButton.click();
+
+  await this.problemTextbox.waitFor({ state: 'visible' });
+  await this.problemTextbox.fill(problemName);
+
+  await this.problemUser.fill(problemUser);
+
+  await this.problemStatemnt.fill(problemStatement);
+
+  await this.problemEvidence.fill(problemEvidence);
+
+  await this.page.getByRole('button', {
+    name: 'Add problem'
+  }).click();
+
+  console.log('✅ Problem has been added successfully...');
+}
+
+//addAssumption
+async addAssumption() {
+  const assumption = generateRandomName('Assumption');
+
+  await this.assumptionsButton.click();
+
+  await this.addAssumptionButton.click();
+
+  await this.page.getByRole('textbox', { name: 'Write the assumption as a' }).waitFor({ state: 'visible' });
+  await this.page
+    .getByRole('textbox', {
+      name: 'Write the assumption as a'
+    })
+    .fill(assumption);
+
+  await this.page.getByRole('button', {
+    name: 'Add assumption'
+  }).click();
+
+  console.log('✅ Assumption has been added successfully...');
+}
+
+//addExperiment
+async addExperiment() {
+  const experimentTitle = generateRandomName('Experiment');
+  const hypothesis = generateRandomName('Hypothesis');
+  const method = generateRandomName('Method');
+  const successMetric = generateRandomName('Metric');
+  const outcomeSummary = generateRandomName('Outcome');
+  const decision = generateRandomName('Decision');
+  const notes = generateRandomName('Notes');
+
+  await this.experimentsButton.click();
+
+  await this.addExperimentButton.click();
+
+  await this.page.getByRole('textbox', { name: 'Example: Validate onboarding' }).waitFor({ state: 'visible' });
+  await this.page.getByRole('textbox', { name: 'Example: Validate onboarding' }).fill(experimentTitle);
+
+  await this.hypothesis.fill(hypothesis);
+  await this.method.fill(method);
+  await this.successMetric.fill(successMetric);
+  await this.outcomeSummary.fill(outcomeSummary);
+  await this.exDecision.fill(decision);
+  await this.exNotes.fill(notes);
+  
+
+  await this.page.getByRole('button', { name: 'Add experiment' }).click();
+
+  console.log('✅ Experiment has been added successfully...');
+}
+
+//addRisk
+async addRisk() {
+  const riskTitle = generateRandomName('Risk');
+  const riskMitigation = generateRandomName('Mitigation');
+  const riskNotes = generateRandomName('Notes');
+
+  await this.risksButton.click();
+
+  await this.addRiskButton.click();
+
+  await this.riskTitle.waitFor({ state: 'visible' });
+  await this.riskTitle.fill(riskTitle);
+
+  await this.riskMitigation.fill(riskMitigation);
+  await this.notesField.waitFor({ state: 'visible', timeout: 10000 });
+  await this.notesField.fill(riskNotes);
+
+  await this.page.getByRole('button', { name: 'Add risk' }).click();
+
+  console.log('✅ Risk has been added successfully...');
+}
+
+//addDecision
+async addDecision() {
+  const decisionTitle = generateRandomName('Decision');
+  const decisionDescription = generateRandomName('Description');
+  const decisionRationale = generateRandomName('Rationale');
+  const decisionAlternatives = generateRandomName('Alternatives');
+  const decisionNotes = generateRandomName('Notes');
+
+  await this.decisionsButton.click();
+
+  await this.addDecisionButton.click();
+
+  await this.addDecisionTitle.waitFor({ state: 'visible' });
+  await this.addDecisionTitle.fill(decisionTitle);
+
+  await this.addDecisionDescription.fill(decisionDescription);
+  await this.addDecisionRationale.fill(decisionRationale);
+  await this.addDecisionAlternatives.fill(decisionAlternatives);
+  await this.addDecisionNotes.fill(decisionNotes);
+
+  await this.UpdateDecisionBtn.click();
+
+  console.log('✅ Decision has been added successfully...');
+}
+
+//addLesson
+async addLesson() {
+  const lessonTitle = generateRandomName('Lesson');
+  const lessonSummary = generateRandomName('Summary');
+  const lessonLearn = generateRandomName('Learn');
+  const lessonContext = generateRandomName('Context');
+  const lessonWorked = generateRandomName('Worked');
+  const lessonNotWorked = generateRandomName('NotWorked');
+  const lessonRecommend = generateRandomName('Recommend');
+
+  await this.lessonsButton.click();
+
+  await this.addLessonButton.click();
+
+  await this.addLessonTitle.waitFor({ state: 'visible' });
+  await this.addLessonTitle.fill(lessonTitle);
+  await this.addLessonSummary.fill(lessonSummary);
+  await this.addLessonLearn.fill(lessonLearn);
+  await this.addLessoncontext.fill(lessonContext);
+  await this.addLessonworked.fill(lessonWorked);
+  await this.addLessonNotWorked.fill(lessonNotWorked);
+  await this.addLessonRecommen.fill(lessonRecommend);
+
+  await this.updateLessonBtn.click();
+  await this.page.waitForFunction(() => {
+    const dialog = [...document.querySelectorAll('[role="dialog"]')].find(d => d.textContent.includes('Capture learnings'));
+    return !dialog || dialog.style.pointerEvents !== 'auto';
+  });
+
+  console.log('✅ Lesson has been added successfully...');
+}
+
+//addTeamMember
+async addTeamMember() {
+  
+  await this.teamButton.click();
+
+  await this.addTeamButton.click();
+  await this.page.getByText('Add team member').waitFor({ state: 'visible', timeout: 10000 });
+
+  await this.selectUserButton.click();
+  await this.addMember.waitFor({ state: 'visible', timeout: 10000 });
+
+  await this.addMember.click();
+
+  console.log('✅ Team member has been added successfully...');
+}
+
+//addLink
+async addLink() {
+  await this.page.locator('div.absolute.inset-0.z-20').waitFor({ state: 'hidden' });
+
+  await this.addLinkdropdown.click();
+
+  await this.addLinkBtn.click();
+
+  await this.linkTitleTextbox.click();
+  const linkTitle = generateRandomName('Link');
+  await this.linkTitleTextbox.fill(linkTitle);
+
+  await this.linkUrlTextbox.click();
+  await this.linkUrlTextbox.fill('https://google.com');
+
+  await this.addLinkBtn2.click();
+
+  console.log('✅ Link has been added successfully...');
+
+  await this.FunnelBack.click();
+}
+
+async completeIdeaFlow() {
+  await this.fillDetailsSection();
+  await this.addTask();
+  await this.publishCanvas();
+  await this.addProblem();
+  await this.addAssumption();
+  await this.addExperiment();
+  await this.addRisk();
+  await this.addDecision();
+  await this.addLesson();
+  await this.addTeamMember();
+  await this.addLink();
+}
+
+}
+
+module.exports = { IdeaPage };
