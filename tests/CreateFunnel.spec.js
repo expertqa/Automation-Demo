@@ -5,7 +5,7 @@ import { IdeaPage } from '../pages/IdeaPage';
 import { KanbanPage } from '../pages/IdeaKanabanPage.js';
 
 test('Create Funnel, add Idea and move it through Kanban stages', async ({ page }) => {
-  test.setTimeout(120000);
+  test.setTimeout(process.env.CI ? 180000 : 120000);
 
   const funnelPage = new FunnelPage(page);
   const ideaPage = new IdeaPage(page);

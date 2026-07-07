@@ -46,12 +46,14 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { 
-        viewport: null,
-        launchOptions: {
-          args: ['--start-maximized'],
-        }
-       },
+      use: process.env.CI
+        ? { viewport: { width: 1920, height: 1080 } }
+        : {
+            viewport: null,
+            launchOptions: {
+              args: ['--start-maximized'],
+            },
+          },
     },
 
     /* Test against mobile viewports. */
