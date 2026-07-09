@@ -339,6 +339,7 @@ export class ProjectPage {
     await this.addLessonNotWorked.fill(lessonNotWorked);
     await this.addLessonRecommend.fill(lessonRecommend);
 
+    await this.updateLessonBtn.waitFor({ state: 'visible', timeout: 30000 });
     await this.updateLessonBtn.click();
     await this.page.waitForFunction(() => {
       const dialog = [...document.querySelectorAll('[role="dialog"]')].find(d => d.textContent.includes('Capture learnings'));
