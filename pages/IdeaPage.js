@@ -236,6 +236,7 @@ async addProblem() {
 
   await this.problemEvidence.fill(problemEvidence);
 
+  await this.addProblemSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
   await this.addProblemSubmitButton.click();
 
   console.log('✅ Problem has been added successfully...');
@@ -252,6 +253,7 @@ async addAssumption() {
   await this.assumptionTextbox.waitFor({ state: 'visible' });
   await this.assumptionTextbox.fill(assumption);
 
+  await this.addAssumptionSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
   await this.addAssumptionSubmitButton.click();
 
   console.log('✅ Assumption has been added successfully...');
@@ -280,8 +282,8 @@ async addExperiment() {
   await this.outcomeSummary.fill(outcomeSummary);
   await this.exDecision.fill(decision);
   await this.exNotes.fill(notes);
-  
 
+  await this.addExperimentSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
   await this.addExperimentSubmitButton.click();
 
   console.log('✅ Experiment has been added successfully...');
@@ -304,6 +306,7 @@ async addRisk() {
   await this.notesField.waitFor({ state: 'visible', timeout: 10000 });
   await this.notesField.fill(riskNotes);
 
+  await this.addRiskSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
   await this.addRiskSubmitButton.click();
 
   console.log('✅ Risk has been added successfully...');
@@ -329,6 +332,7 @@ async addDecision() {
   await this.addDecisionAlternatives.fill(decisionAlternatives);
   await this.addDecisionNotes.fill(decisionNotes);
 
+  await this.UpdateDecisionBtn.waitFor({ state: 'visible', timeout: 30000 });
   await this.UpdateDecisionBtn.click();
 
   console.log('✅ Decision has been added successfully...');
@@ -357,6 +361,7 @@ async addLesson() {
   await this.addLessonNotWorked.fill(lessonNotWorked);
   await this.addLessonRecommen.fill(lessonRecommend);
 
+  await this.updateLessonBtn.waitFor({ state: 'visible', timeout: 30000 });
   await this.updateLessonBtn.click();
   await this.page.waitForFunction(() => {
     const dialog = [...document.querySelectorAll('[role="dialog"]')].find(d => d.textContent.includes('Capture learnings'));

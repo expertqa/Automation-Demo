@@ -34,13 +34,18 @@ export class AutomationPage {
       'xpath=//*[normalize-space(text())="Funnel"][not(ancestor::table)]/following::button[@role="combobox"][1]'
     );
     this.agileFlowSuggestion = page.getByLabel('Suggestions').getByText('Agile Flow', { exact: true });
+
+    // Idea's own Funnel field (Details tab)
+    this.ideaFunnelFieldCombobox = page.locator(
+      'xpath=//*[normalize-space(text())="Funnel"]/following::button[@role="combobox"][1]'
+    );
     this.conditionFieldCombobox = page.getByRole('combobox').filter({ hasText: 'Idea score' });
     this.departmentFieldOption = page.locator('div').filter({ hasText: /^Department$/ }).nth(1);
 
     // Funnel switching
     this.funnelSwitcherCombobox = page.getByRole('combobox').first();
     this.funnelSearchTextbox = page.getByPlaceholder('Search', { exact: true });
-    this.agileFlowOption = page.getByRole('option', { name: 'Agile Flow', exact: true });
+    this.agileFlowOption = page.getByText(/^Agile Flow\b/).first();
 
     // Idea link by title (dynamic)
     this.ideaLinkByTitle = (ideaTitle) => page.getByRole('link', { name: ideaTitle, exact: true });
@@ -133,9 +138,20 @@ export class AutomationPage {
 
   //createIdea
   async createIdea() {
-   
+    const currentFunnelLabel = await this.funnelSwitcherCombobox.innerText();
+
+    if (!currentFunnelLabel.includes('Agile Flow')) {
+      await this.funnelSwitcherCombobox.click();
+      await this.funnelSearchTextbox.fill('agile');
+      await this.agileFlowOption.click();
+    }
+
     const { ideaName } = await this.ideaPage.createIdea();
     await this.ideaPage.fillDetailsSection();
+
+    await this.ideaFunnelFieldCombobox.click();
+    await this.agileFlowSuggestion.click();
+
     console.log('✅ New idea has been created successfully...');
 
     return ideaName;
@@ -145,9 +161,22 @@ export class AutomationPage {
   async updateIdeaTitle(ideaTitle, newIdeaTitle) {
     await this.ideasButton.click();
 
-    await this.page.waitForLoadState('networkidle');
+    await this.page
+      .waitForFunction(() => !document.querySelector('.animate-pulse'), { timeout: 15000 })
+      .catch(() => {});
 
+    const currentFunnelLabel = await this.funnelSwitcherCombobox.innerText();
+
+    if (!currentFunnelLabel.includes('Agile Flow')) {
+      await this.funnelSwitcherCombobox.click();
+      await this.funnelSearchTextbox.fill('agile');
+      await this.agileFlowOption.click();
+    }
+await this.page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
     await this.searchIdeasTextbox.fill(ideaTitle);
+
+    
+
     await this.ideaLinkByTitle(ideaTitle).click();
 
     await this.ideaTitleButton.click();

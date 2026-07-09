@@ -219,6 +219,7 @@ export class ProjectPage {
     await this.problemStatement.fill(problemStatement);
     await this.problemEvidence.fill(problemEvidence);
 
+    await this.addProblemSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
     await this.addProblemSubmitButton.click();
 
     console.log('✅ Problem has been added successfully...');
@@ -235,6 +236,7 @@ export class ProjectPage {
     await this.assumptionTextbox.waitFor({ state: 'visible' });
     await this.assumptionTextbox.fill(assumption);
 
+    await this.addAssumptionSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
     await this.addAssumptionSubmitButton.click();
 
     console.log('✅ Assumption has been added successfully...');
@@ -264,6 +266,7 @@ export class ProjectPage {
     await this.exDecision.fill(decision);
     await this.exNotes.fill(notes);
 
+    await this.addExperimentSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
     await this.addExperimentSubmitButton.click();
 
     console.log('✅ Experiment has been added successfully...');
@@ -286,6 +289,7 @@ export class ProjectPage {
     await this.notesField.waitFor({ state: 'visible', timeout: 10000 });
     await this.notesField.fill(riskNotes);
 
+    await this.addRiskSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
     await this.addRiskSubmitButton.click();
 
     console.log('✅ Risk has been added successfully...');
@@ -311,6 +315,7 @@ export class ProjectPage {
     await this.addDecisionAlternatives.fill(decisionAlternatives);
     await this.addDecisionNotes.fill(decisionNotes);
 
+    await this.updateDecisionBtn.waitFor({ state: 'visible', timeout: 30000 });
     await this.updateDecisionBtn.click();
 
     console.log('✅ Decision has been added successfully...');
