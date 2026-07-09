@@ -15,6 +15,7 @@ export class ProjectPage {
     // Tags
     this.tagInput = page.getByRole('textbox', { name: 'Tag input' });
     this.noSuggestions = page.getByText('No suggestions');
+    this.createTagButton = (tagName) => page.getByRole('button', { name: `Create ${tagName}` });
 
     // Team
     this.acceptMissionButton = page.getByRole('button', { name: 'Accept Mission' });
@@ -47,16 +48,19 @@ export class ProjectPage {
     this.problemUser = page.getByRole('textbox', { name: 'Who is impacted?' });
     this.problemStatement = page.getByRole('textbox', { name: 'What is happening, for who,' });
     this.problemEvidence = page.getByRole('textbox', { name: 'Metrics, quotes, incidents' });
+    this.addProblemSubmitButton = page.getByRole('button', { name: 'Add problem' });
 
     // Assumptions
     this.assumptionsButton = page.getByRole('button', { name: 'Assumptions' });
     this.addAssumptionButton = page.locator('button').filter({ hasText: /^Add assumption$/ });
     this.assumptionTextbox = page.getByRole('textbox', { name: 'Write the assumption as a' });
+    this.addAssumptionSubmitButton = page.getByRole('button', { name: 'Add assumption' });
 
     // Experiments
     this.experimentsButton = page.getByRole('button', { name: 'Experiments' });
     this.addExperimentButton = page.getByRole('button', { name: 'Add Experiment', exact: true });
     this.experimentTitle = page.getByRole('textbox', { name: 'Example: Validate onboarding' });
+    this.addExperimentSubmitButton = page.getByRole('button', { name: 'Add experiment' });
     this.hypothesis = page.locator('div').filter({ hasText: /^Hypothesis/ }).locator('textarea').first();
     this.method = page.locator('div').filter({ hasText: /^Method/ }).locator('textarea').first();
     this.successMetric = page.locator('div').filter({ hasText: /^Success metric/ }).locator('textarea').first();
@@ -70,6 +74,7 @@ export class ProjectPage {
     this.riskTitle = page.getByRole('textbox').first();
     this.riskMitigation = page.getByRole('textbox', { name: 'Describe the mitigation' });
     this.notesField = page.getByRole('textbox', { name: 'Add context or follow ups' });
+    this.addRiskSubmitButton = page.getByRole('button', { name: 'Add risk' });
 
     // Decisions
     this.decisionsButton = page.getByRole('button', { name: 'Decisions' });
@@ -128,7 +133,7 @@ export class ProjectPage {
     await this.tagInput.fill(tagName);
     await this.noSuggestions.click();
 
-    await this.page.getByRole('button', { name: `Create ${tagName}` }).click();
+    await this.createTagButton(tagName).click();
 
     console.log('✅ Tag has been added successfully...');
   }
@@ -214,7 +219,7 @@ export class ProjectPage {
     await this.problemStatement.fill(problemStatement);
     await this.problemEvidence.fill(problemEvidence);
 
-    await this.page.getByRole('button', { name: 'Add problem' }).click();
+    await this.addProblemSubmitButton.click();
 
     console.log('✅ Problem has been added successfully...');
   }
@@ -230,7 +235,7 @@ export class ProjectPage {
     await this.assumptionTextbox.waitFor({ state: 'visible' });
     await this.assumptionTextbox.fill(assumption);
 
-    await this.page.getByRole('button', { name: 'Add assumption' }).click();
+    await this.addAssumptionSubmitButton.click();
 
     console.log('✅ Assumption has been added successfully...');
   }
@@ -259,7 +264,7 @@ export class ProjectPage {
     await this.exDecision.fill(decision);
     await this.exNotes.fill(notes);
 
-    await this.page.getByRole('button', { name: 'Add experiment' }).click();
+    await this.addExperimentSubmitButton.click();
 
     console.log('✅ Experiment has been added successfully...');
   }
@@ -281,7 +286,7 @@ export class ProjectPage {
     await this.notesField.waitFor({ state: 'visible', timeout: 10000 });
     await this.notesField.fill(riskNotes);
 
-    await this.page.getByRole('button', { name: 'Add risk' }).click();
+    await this.addRiskSubmitButton.click();
 
     console.log('✅ Risk has been added successfully...');
   }

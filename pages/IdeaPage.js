@@ -3,7 +3,7 @@ const { expect } = require('@playwright/test');
 
 
 
-class IdeaPage {
+export class IdeaPage {
   constructor(page) {
     this.page = page;
 
@@ -52,11 +52,16 @@ this.problemTextbox = page.getByRole('textbox', {
 this.problemUser = page.getByRole('textbox', { name: 'Who is impacted?' });
 this.problemStatemnt = page.getByRole('textbox', { name: 'What is happening, for who,' });
 this.problemEvidence = page.getByRole('textbox', { name: 'Metrics, quotes, incidents' });
+this.addProblemSubmitButton = page.getByRole('button', {
+  name: 'Add problem'
+});
 // Assumptions
 this.assumptionsButton = page.getByRole('button', {
   name: 'Assumptions'
 });
 this.addAssumptionButton = page.locator('button').filter({ hasText: /^Add assumption$/ });
+this.assumptionTextbox = page.getByRole('textbox', { name: 'Write the assumption as a' });
+this.addAssumptionSubmitButton = page.getByRole('button', { name: 'Add assumption' });
 
 // Experiments
 this.experimentsButton = page.getByRole('button', {  name: 'Experiments' });
@@ -67,6 +72,8 @@ this.successMetric = page.locator('div').filter({ hasText: /^Success metric/ }).
 this.outcomeSummary = page.locator('div').filter({ hasText: /^Outcome summary/ }).locator('textarea').first();
 this.exDecision = page.locator('div').filter({ hasText: /^Decision/ }).locator('textarea').first();
 this.exNotes = page.locator('div').filter({ hasText: /^Notes/ }).locator('textarea').first();
+this.experimentTitleTextbox = page.getByRole('textbox', { name: 'Example: Validate onboarding' });
+this.addExperimentSubmitButton = page.getByRole('button', { name: 'Add experiment' });
 
 // Risks
 this.risksButton = page.getByRole('button', { name: 'Risks' });
@@ -74,6 +81,7 @@ this.addRiskButton = page.locator('button').filter({ hasText: /^Add risk$/ });
 this.riskTitle = page.getByRole('textbox').first();
 this.riskMitigation = page.getByRole('textbox', { name: 'Describe the mitigation' });
 this.notesField = this.page.getByRole('textbox', { name: 'Add context or follow ups' });
+this.addRiskSubmitButton = page.getByRole('button', { name: 'Add risk' });
 
 // Decisions
 this.decisionsButton = page.getByRole('button', {
@@ -111,6 +119,7 @@ this.addTeamButton = page.locator('div').filter({ hasText: /^Team members\s*\d/ 
 
 this.selectUserButton = page.locator('button[data-slot="popover-trigger"]').filter({ hasText: 'Select a user' });
 this.addMember = page.getByLabel('Suggestions').getByText('Muhammad SQA8');
+this.addTeamMemberHeading = page.getByText('Add team member');
 
 
 // Links
@@ -122,6 +131,9 @@ this.addLinkBtn2 = page.getByRole('button', { name: 'Add link' }).nth(1);
 
 //Back to funnel
 this.FunnelBack = page.getByRole('link', { name: 'Back to funnel' });
+
+// Loading overlay
+this.loadingOverlay = page.locator('div.absolute.inset-0.z-20');
 
   }
 
@@ -224,9 +236,7 @@ async addProblem() {
 
   await this.problemEvidence.fill(problemEvidence);
 
-  await this.page.getByRole('button', {
-    name: 'Add problem'
-  }).click();
+  await this.addProblemSubmitButton.click();
 
   console.log('✅ Problem has been added successfully...');
 }
@@ -239,16 +249,10 @@ async addAssumption() {
 
   await this.addAssumptionButton.click();
 
-  await this.page.getByRole('textbox', { name: 'Write the assumption as a' }).waitFor({ state: 'visible' });
-  await this.page
-    .getByRole('textbox', {
-      name: 'Write the assumption as a'
-    })
-    .fill(assumption);
+  await this.assumptionTextbox.waitFor({ state: 'visible' });
+  await this.assumptionTextbox.fill(assumption);
 
-  await this.page.getByRole('button', {
-    name: 'Add assumption'
-  }).click();
+  await this.addAssumptionSubmitButton.click();
 
   console.log('✅ Assumption has been added successfully...');
 }
@@ -267,8 +271,8 @@ async addExperiment() {
 
   await this.addExperimentButton.click();
 
-  await this.page.getByRole('textbox', { name: 'Example: Validate onboarding' }).waitFor({ state: 'visible' });
-  await this.page.getByRole('textbox', { name: 'Example: Validate onboarding' }).fill(experimentTitle);
+  await this.experimentTitleTextbox.waitFor({ state: 'visible' });
+  await this.experimentTitleTextbox.fill(experimentTitle);
 
   await this.hypothesis.fill(hypothesis);
   await this.method.fill(method);
@@ -278,7 +282,7 @@ async addExperiment() {
   await this.exNotes.fill(notes);
   
 
-  await this.page.getByRole('button', { name: 'Add experiment' }).click();
+  await this.addExperimentSubmitButton.click();
 
   console.log('✅ Experiment has been added successfully...');
 }
@@ -300,7 +304,7 @@ async addRisk() {
   await this.notesField.waitFor({ state: 'visible', timeout: 10000 });
   await this.notesField.fill(riskNotes);
 
-  await this.page.getByRole('button', { name: 'Add risk' }).click();
+  await this.addRiskSubmitButton.click();
 
   console.log('✅ Risk has been added successfully...');
 }
@@ -368,7 +372,7 @@ async addTeamMember() {
   await this.teamButton.click();
 
   await this.addTeamButton.click();
-  await this.page.getByText('Add team member').waitFor({ state: 'visible', timeout: 10000 });
+  await this.addTeamMemberHeading.waitFor({ state: 'visible', timeout: 10000 });
 
   await this.selectUserButton.click();
   await this.addMember.waitFor({ state: 'visible', timeout: 10000 });
@@ -380,7 +384,7 @@ async addTeamMember() {
 
 //addLink
 async addLink() {
-  await this.page.locator('div.absolute.inset-0.z-20').waitFor({ state: 'hidden' });
+  await this.loadingOverlay.waitFor({ state: 'hidden' });
 
   await this.addLinkdropdown.click();
 
@@ -415,5 +419,3 @@ async completeIdeaFlow() {
 }
 
 }
-
-module.exports = { IdeaPage };

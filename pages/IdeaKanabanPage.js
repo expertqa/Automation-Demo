@@ -15,6 +15,14 @@ export class KanbanPage {
         this.ideaSuggestions = page.getByLabel('Suggestions').getByText('Review idea');
         this.ideaMove = page.getByRole('button', { name: 'Move' });
 
+        // Drag and drop (dynamic)
+        this.ideaCardByTitle = (itemTitle) => page.getByText(itemTitle, { exact: false }).first();
+        this.laneByName = (laneName) =>
+          page
+            .locator('div')
+            .filter({ hasText: new RegExp(`^${laneName}`) })
+            .and(page.locator('.bg-gray-100'))
+            .first();
     }
 
 
@@ -26,8 +34,8 @@ export class KanbanPage {
         }
 
         async dragIdeaToLane(itemTitle, targetLaneName) {
-            const sourceCard = this.page.getByText(itemTitle, { exact: false }).first();
-            const targetLane = this.page.locator('div').filter({ hasText: new RegExp(`^${targetLaneName}`) }).and(this.page.locator('.bg-gray-100')).first();
+            const sourceCard = this.ideaCardByTitle(itemTitle);
+            const targetLane = this.laneByName(targetLaneName);
 
             await sourceCard.waitFor({ state: 'visible' });
             await targetLane.waitFor({ state: 'visible' });
