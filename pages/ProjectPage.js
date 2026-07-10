@@ -4,6 +4,9 @@ export class ProjectPage {
   constructor(page) {
     this.page = page;
 
+    // Loading overlay
+    this.loadingOverlay = page.locator('div.absolute.inset-0.z-20');
+
     // Navigation
     this.projectsButton = page.getByRole('button', { name: 'Projects' });
     this.addProjectButton = page.getByRole('button', { name: 'Add project' });
@@ -220,6 +223,7 @@ export class ProjectPage {
     await this.problemEvidence.fill(problemEvidence);
 
     await this.addProblemSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.addProblemSubmitButton.click();
 
     console.log('✅ Problem has been added successfully...');
@@ -237,6 +241,7 @@ export class ProjectPage {
     await this.assumptionTextbox.fill(assumption);
 
     await this.addAssumptionSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.addAssumptionSubmitButton.click();
 
     console.log('✅ Assumption has been added successfully...');
@@ -267,6 +272,7 @@ export class ProjectPage {
     await this.exNotes.fill(notes);
 
     await this.addExperimentSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.addExperimentSubmitButton.click();
 
     console.log('✅ Experiment has been added successfully...');
@@ -290,6 +296,7 @@ export class ProjectPage {
     await this.notesField.fill(riskNotes);
 
     await this.addRiskSubmitButton.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.addRiskSubmitButton.click();
 
     console.log('✅ Risk has been added successfully...');
@@ -316,6 +323,7 @@ export class ProjectPage {
     await this.addDecisionNotes.fill(decisionNotes);
 
     await this.updateDecisionBtn.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.updateDecisionBtn.click();
 
     console.log('✅ Decision has been added successfully...');
@@ -345,6 +353,7 @@ export class ProjectPage {
     await this.addLessonRecommend.fill(lessonRecommend);
 
     await this.updateLessonBtn.waitFor({ state: 'visible', timeout: 30000 });
+    await this.loadingOverlay.waitFor({ state: 'hidden' }).catch(() => {});
     await this.updateLessonBtn.click();
     await this.page.waitForFunction(() => {
       const dialog = [...document.querySelectorAll('[role="dialog"]')].find(d => d.textContent.includes('Capture learnings'));
