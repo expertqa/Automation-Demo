@@ -73,7 +73,7 @@ export class BrandingPage {
   }
 
   //brandingCompany
-  async brandingCompany(logoPath = 'test-data/test-icon.AVIF', squareLogoPath = 'test-data/logo.jpg', color = '#4F46E5') {
+  async brandingCompany(logoPath = 'test-data/test-icon.avif', squareLogoPath = 'test-data/logo.jpg', color = '#4F46E5') {
     await this.navigateToBranding();
     await this.uploadImage(this.logoEditButton, logoPath);
     await this.uploadImage(this.squareLogoEditButton, squareLogoPath);

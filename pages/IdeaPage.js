@@ -8,7 +8,7 @@ export class IdeaPage {
     this.page = page;
 
     // Create Idea
-this.addIdeaButton = page.getByRole('button', { name: 'Add idea' });
+this.addIdeaButton = page.getByRole('button', { name: 'Add idea', exact: true }).first();
 this.enterManuallyButton = page.getByRole('button', { name: 'Enter manually' });
 this.ideaTitleTextbox = page.getByRole('textbox', {
   name: 'Title'
