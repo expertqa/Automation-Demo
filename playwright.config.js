@@ -34,6 +34,7 @@ export default defineConfig({
     baseURL: "https://automationqa-7082.acceptmission.com",
     headless: !!process.env.CI,
     channel: "",
+    locale: 'en-US',
 
     /* Every test starts with the authenticated state produced by globalSetup. */
     storageState: 'state.json',
