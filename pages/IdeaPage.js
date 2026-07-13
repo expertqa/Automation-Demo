@@ -115,7 +115,7 @@ this.updateLessonBtn = page.getByRole('button', { name: 'Update lesson' });
 
 
 // Team
-this.teamButton = page.getByText('Team');
+this.teamButton = page.getByText('Team', { exact: true });
 
 this.addTeamButton = page.locator('div').filter({ hasText: /^Team members\s*\d/ }).getByRole('button', { name: 'Add' });
 
@@ -142,6 +142,12 @@ this.ideaLikeButton = page.locator('div[role="button"]').filter({ has: page.loca
 
 // Loading overlay
 this.loadingOverlay = page.locator('div.absolute.inset-0.z-20');
+
+// Comments
+this.commentsTab = page.getByRole('tab', { name: 'Comments' });
+this.portalButton = page.getByRole('button', { name: 'Portal' });
+this.commentBox = page.getByRole('textbox', { name: 'Write your comment...' });
+this.submitCommentButton = page.getByRole('button', { name: 'Submit' });
 
   }
 
@@ -384,6 +390,26 @@ async addLesson() {
   console.log('✅ Lesson has been added successfully...');
 }
 
+//addComment
+async addComment() {
+  const internalComment = generateRandomName('Comment');
+  const portalComment = generateRandomName('Comment');
+
+  await this.commentsTab.click();
+
+  await this.commentBox.click();
+  await this.commentBox.fill(internalComment);
+  await this.submitCommentButton.click();
+
+  await this.portalButton.click();
+
+  await this.commentBox.click();
+  await this.commentBox.fill(portalComment);
+  await this.submitCommentButton.click();
+
+  console.log('✅ Comments have been added successfully...');
+}
+
 //addTeamMember
 async addTeamMember() {
   
@@ -439,6 +465,7 @@ async completeIdeaFlow() {
   await this.addRisk();
   await this.addDecision();
   await this.addLesson();
+  await this.addComment();
   await this.addTeamMember();
   await this.addLink();
 }
