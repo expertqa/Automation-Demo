@@ -28,7 +28,6 @@ test('Create Funnel, add Idea and move it through Kanban stages', async ({ page 
   });
 
   await test.step('Move idea through Kanban stages', async () => {
-    await page.getByRole('button', { name: 'Ideas' }).click();
     await kanbanPage.moveIdeaToStage1(ideaTitle, '2. Review idea');
   });
 });

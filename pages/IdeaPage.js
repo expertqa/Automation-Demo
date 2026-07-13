@@ -33,6 +33,8 @@ this.workTab = page.getByRole('tab', { name: 'Work' });
 this.addTaskBtn = page.getByRole('button', { name: 'Add task' });
 this.taskTitle = page.getByRole('textbox', { name: 'Title' });
 this.addPhase = page.getByRole('textbox', { name: 'Phase' });
+this.datePicker = page.getByRole('button', { name: 'Pick a date' }).nth(1);
+this.selectDate = page.getByRole('gridcell', { name: '8', exact: true });
 this.addDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
 
 // Canvas
@@ -128,9 +130,15 @@ this.addLinkBtn = page.getByRole('button', { name: 'Add link' })
 this.linkTitleTextbox = page.getByRole('textbox', { name: 'Title of the link' });
 this.linkUrlTextbox = page.getByRole('textbox', { name: 'https://' });
 this.addLinkBtn2 = page.getByRole('button', { name: 'Add link' }).nth(1);
+this.ideasStatusDropdown = page.getByRole('combobox');
+this.selectIdaeStatus = page.getByRole('option', { name: 'Submitted', exact: true });
 
 //Back to funnel
 this.FunnelBack = page.getByRole('link', { name: 'Back to funnel' });
+this.followButton = page.getByRole('button', { name: 'Follow' });
+
+// Idea like (sidebar icon row, distinct from the "Follow" toolbar button)
+this.ideaLikeButton = page.locator('div[role="button"]').filter({ has: page.locator('svg.lucide-heart') });
 
 // Loading overlay
 this.loadingOverlay = page.locator('div.absolute.inset-0.z-20');
@@ -188,6 +196,11 @@ async addTask() {
   await this.taskTitle.fill(taskTitle);
 
   await this.addPhase.fill(taskPhase);
+
+  await this.datePicker.click();
+
+  await this.selectDate.click();
+  await this.page.keyboard.press('Escape');
 
   await this.addDescription.fill(taskDescription);
 
@@ -405,6 +418,13 @@ async addLink() {
   await this.addLinkBtn2.click();
 
   console.log('✅ Link has been added successfully...');
+
+   await this.ideasStatusDropdown.click();
+  await this.selectIdaeStatus.click();
+
+  await this.followButton.click();
+
+  await this.ideaLikeButton.click();
 
   await this.FunnelBack.click();
 }
