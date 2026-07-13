@@ -36,6 +36,7 @@ async createFunnel() {
   await this.createIdeaFunnelLink.waitFor({ state: 'visible', timeout: 30000 });
   await this.createIdeaFunnelLink.click();
 
+  await this.funnelTitleInput.waitFor({ state: 'visible', timeout: 30000 });
   await this.funnelTitleInput.fill(funnelName, { timeout: 30000 });
   await Promise.all([
     this.page.waitForURL(/\/studio\/funnels\/\d+\?view=kanban/, { timeout: 30000 }),
