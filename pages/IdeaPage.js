@@ -120,8 +120,10 @@ this.teamButton = page.getByText('Team', { exact: true });
 this.addTeamButton = page.locator('div').filter({ hasText: /^Team members\s*\d/ }).getByRole('button', { name: 'Add' });
 
 this.selectUserButton = page.locator('button[data-slot="popover-trigger"]').filter({ hasText: 'Select a user' });
-this.addMember = page.getByLabel('Suggestions').getByText('Muhammad SQA8');
 this.addTeamMemberHeading = page.getByText('Add team member');
+// The user picker is a "Suggestions" listbox of role="option" items; index 0
+// is always "(Select All)", so index 1 is the first real, selectable user.
+this.addMember = page.getByLabel('Suggestions').getByRole('option').nth(1);
 
 
 // Links
@@ -137,8 +139,13 @@ this.selectIdaeStatus = page.getByRole('option', { name: 'Submitted', exact: tru
 this.FunnelBack = page.getByRole('link', { name: 'Back to funnel' });
 this.followButton = page.getByRole('button', { name: 'Follow' });
 
-// Idea like (sidebar icon row, distinct from the "Follow" toolbar button)
-this.ideaLikeButton = page.locator('div[role="button"]').filter({ has: page.locator('svg.lucide-heart') });
+// Idea like (sidebar icon row, distinct from the "Follow" toolbar button).
+// Both the icon (heart vs thumbs-up) and accessible name ("Like idea" vs none,
+// falling back to its count text) vary by domain, so target it by position in
+// the icon row instead: it's always the first button, immediately before
+// Comments/Bookmark/Views, whichever domain's markup renders it.
+this.bookmarkIdeaButton = page.getByRole('button', { name: /Bookmark/ });
+this.ideaLikeButton = this.bookmarkIdeaButton.locator('xpath=..').getByRole('button').first();
 
 // Loading overlay
 this.loadingOverlay = page.locator('div.absolute.inset-0.z-20');
@@ -159,8 +166,14 @@ async createIdea() {
   await this.addIdeaButton.waitFor({ state: 'visible', timeout: 30000 });
   await this.addIdeaButton.click();
 
-  await this.enterManuallyButton.waitFor({ state: 'visible', timeout: 30000 });
-  await this.enterManuallyButton.click();
+  // Some flows land directly on manual entry without an intermediate
+  // "Enter manually" choice screen, so don't hard-fail if it never appears.
+  const manualChoiceVisible = await this.enterManuallyButton
+    .isVisible({ timeout: 15000 })
+    .catch(() => false);
+  if (manualChoiceVisible) {
+    await this.enterManuallyButton.click();
+  }
 
   await this.ideaTitleTextbox.waitFor({ state: 'visible', timeout: 30000 });
   await this.ideaTitleTextbox.fill(ideaName);
@@ -420,7 +433,6 @@ async addTeamMember() {
 
   await this.selectUserButton.click();
   await this.addMember.waitFor({ state: 'visible', timeout: 10000 });
-
   await this.addMember.click();
 
   console.log('✅ Team member has been added successfully...');

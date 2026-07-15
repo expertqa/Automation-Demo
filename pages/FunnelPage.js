@@ -25,6 +25,10 @@ export class FunnelPage {
   this.viewIdeasLink = page.getByRole('link', {
     name: 'View Ideas'
   });
+
+  this.saveFunnelButton = page.getByRole('button', {
+    name: 'Save'
+  });
   }
 
 
@@ -38,6 +42,13 @@ async createFunnel() {
 
   await this.funnelTitleInput.waitFor({ state: 'visible', timeout: 30000 });
   await this.funnelTitleInput.fill(funnelName, { timeout: 30000 });
+
+  // "View Ideas" alone navigates into the funnel without properly committing
+  // it server-side (the funnel then never becomes searchable elsewhere, e.g.
+  // as an automation rule's trigger scope) — Save must be clicked explicitly first.
+  await this.saveFunnelButton.click();
+  await this.page.waitForTimeout(1000);
+
   await Promise.all([
     this.page.waitForURL(/\/studio\/funnels\/\d+\?view=kanban/, { timeout: 30000 }),
     this.viewIdeasLink.click({ timeout: 30000 }),

@@ -12,7 +12,10 @@ export default async function globalSetup(playwrightConfig) {
 
   const login = new LoginPage(page);
 
-  await page.goto(config.paths.login);
+  // This SPA keeps background connections open (chat widget, polling, etc.),
+  // so the default 'load' event can hang well past 30s even though the login
+  // form itself is interactive almost immediately — wait for DOM content only.
+  await page.goto(config.paths.login, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await login.login(users.user.email, users.user.password);
 
   await context.storageState({ path: 'state.json' });

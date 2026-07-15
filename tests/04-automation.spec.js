@@ -3,11 +3,15 @@ import { test } from '@playwright/test';
 import { AutomationPage } from '../pages/AutomationPage';
 
 test('Create automation rule and verify it triggers on idea update', async ({ page }) => {
-  test.setTimeout(process.env.CI ? 180000 : 120000);
+  test.setTimeout(process.env.CI ? 240000 : 180000);
 
   const automationPage = new AutomationPage(page);
 
   await page.goto('/');
+
+  await test.step('Create a dedicated funnel for this rule', async () => {
+    await automationPage.createRuleFunnel();
+  });
 
   await test.step('Navigate to Automations', async () => {
     await automationPage.navigateToAutomations();

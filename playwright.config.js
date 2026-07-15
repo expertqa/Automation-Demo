@@ -31,7 +31,7 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     // baseURL: 'http://localhost:3000',
 
-    baseURL: "https://automationqa-7082.acceptmission.com",
+    baseURL: "https://automationqa-7082.acceptmission.com/",
     headless: !!process.env.CI,
     channel: "",
     locale: 'en-US',

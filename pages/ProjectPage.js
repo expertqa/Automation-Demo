@@ -20,9 +20,15 @@ export class ProjectPage {
     this.noSuggestions = page.getByText('No suggestions');
     this.createTagButton = (tagName) => page.getByRole('button', { name: `Create ${tagName}` });
 
-    // Team
-    this.acceptMissionButton = page.getByRole('button', { name: 'Accept Mission' });
-    this.removeAcceptMissionButton = page.getByRole('button', { name: 'Remove Accept Mission' });
+    // Suggested tags (within the still-open "Edit title & description" dialog,
+    // added right after addTag()). This list is workspace-specific — it's
+    // built from tags already used in that domain's data — so pick whichever
+    // is first rather than a fixed name.
+    this.suggestedTagsHeading = page.getByText('Suggested tags', { exact: true });
+    this.suggestedTagButtons = this.suggestedTagsHeading
+      .locator('xpath=following::button')
+      .filter({ hasNotText: 'Recalculate' });
+    this.removeTagButton = (tagName) => page.getByRole('button', { name: `Remove ${tagName}` });
     this.closeButton = page.getByRole('button', { name: 'Close' });
 
     // Details
@@ -141,13 +147,38 @@ export class ProjectPage {
     console.log('✅ Tag has been added successfully...');
   }
 
-  //toggleTeam
-  async toggleTeam() {
-    await this.acceptMissionButton.click();
-    await this.removeAcceptMissionButton.click();
+  //clickWithRetry
+  async clickWithRetry(locator, attempts = 5) {
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        await locator.click({ timeout: 10000 });
+        return;
+      } catch (error) {
+        if (attempt === attempts) throw error;
+        await this.page.waitForTimeout(1000);
+      }
+    }
+  }
+
+  //toggleSuggestedTag
+  async toggleSuggestedTag() {
+    await this.suggestedTagsHeading.waitFor({ state: 'visible', timeout: 15000 });
+
+    // Suggested tags are built from tags already used in this domain's data,
+    // so there's no fixed name to rely on — take whichever is first and
+    // capture its name (the button's text is "name\ncount").
+    const firstTagOption = this.suggestedTagButtons.first();
+    const rawText = await firstTagOption.innerText();
+    const tagName = rawText.split('\n')[0].trim();
+
+    // The suggested-tags list can still be settling/re-rendering right after
+    // addTag(), which detaches this button mid-click, so retry rather than
+    // clicking once.
+    await this.clickWithRetry(firstTagOption);
+    await this.clickWithRetry(this.removeTagButton(tagName));
     await this.closeButton.click();
 
-    console.log('✅ Team selection has been toggled successfully...');
+    console.log('✅ Suggested tag has been added and removed successfully...');
   }
 
   //fillDetailsSection
@@ -390,7 +421,7 @@ export class ProjectPage {
   //completeProjectFlow
   async completeProjectFlow() {
     await this.addTag();
-    await this.toggleTeam();
+    await this.toggleSuggestedTag();
     await this.fillDetailsSection();
     await this.addTask();
     await this.publishCanvas();
