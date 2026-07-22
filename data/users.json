@@ -5,6 +5,11 @@
         "password": "Testing123!"
     },
 
+    "StageUser": {
+        "email": "qaadmin@yopmail.com",
+        "password": "Test@123"
+    },
+
     "invalidUser": {
         "email": "wrong@test.com",
         "password": "WrongPassword"
