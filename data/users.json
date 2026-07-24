@@ -5,9 +5,9 @@
         "password": "Testing123!"
     },
 
-    "StageUser": {
-        "email": "qaadmin@yopmail.com",
-        "password": "Test@123"
+    "Staguser": {
+        "email": "apu-test@yopmail.com",
+        "password": "Test@12345"
     },
 
     "invalidUser": {

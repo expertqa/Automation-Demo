@@ -1,4 +1,4 @@
-import { generateRandomName } from '../utils/helper.js';
+import { generateRandomName, fillRichText } from '../utils/helper.js';
 
 export class TasksPage {
   constructor(page) {
@@ -28,7 +28,7 @@ export class TasksPage {
     this.taskModalComboboxes = this.taskModal.getByRole('combobox');
     this.taskStartDateButton = this.taskModal.getByText('Pick a date').first();
     this.taskDueDateButton = this.taskModal.getByText('Pick a date').nth(1);
-    this.taskDescriptionFrame = page.frameLocator('iframe[title="Rich Text Area"]').locator('body');
+    this.taskDescriptionFrame = this.taskModal.locator('[contenteditable="true"]');
     this.saveTaskButton = this.taskModal.getByRole('button', { name: 'Add task', exact: true });
     this.deleteTaskButton = this.taskModal.getByRole('button', { name: 'Delete', exact: true });
     this.closeTaskModalButton = this.taskModal.getByRole('button', { name: 'Close' });
@@ -91,8 +91,7 @@ export class TasksPage {
 
   //fillDescription
   async fillDescription(text) {
-    await this.taskDescriptionFrame.click();
-    await this.taskDescriptionFrame.fill(text);
+    await fillRichText(this.page, this.taskDescriptionFrame, text, 'task-description');
   }
 
   //saveTask

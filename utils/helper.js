@@ -63,3 +63,28 @@ export function generateFutureDate(daysFromNow = 30) {
   const dd = String(date.getDate()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd}T00:00`;
 }
+
+// Fills a TinyMCE-style rich text editor (an iframe body reached via
+// frameLocator/contentFrame). On CI this iframe has been observed to never
+// become interactable within several minutes, while it's fine locally — a
+// timeout this long pointing at a CI-only cause (network path, asset load)
+// rather than a locator bug. Rather than fail with a bare timeout, capture a
+// screenshot and the page's iframe count so the next CI run tells us why.
+export async function fillRichText(page, frameLocator, text, label) {
+  try {
+    await frameLocator.click();
+    await frameLocator.fill(text);
+  } catch (error) {
+    const safeLabel = label.replace(/[^a-z0-9-_]/gi, '-');
+    const screenshotPath = `rich-text-timeout-${safeLabel}.png`;
+    await page.screenshot({ path: screenshotPath, fullPage: true }).catch(() => {});
+    const iframeCount = await page.locator('iframe').count().catch(() => 'unknown');
+
+    throw new Error(
+      `Rich text editor "${label}" never became interactable.\n` +
+      `Screenshot saved to ${screenshotPath}.\n` +
+      `iframes on page at failure time: ${iframeCount}.\n` +
+      `${error.message}`
+    );
+  }
+}

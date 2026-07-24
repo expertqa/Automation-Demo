@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 
 import { ProjectPage } from '../pages/ProjectPage';
 
-test('Create Project and complete project flow', async ({ page }) => {
+test('TC-03 — Project', async ({ page }) => {
   test.setTimeout(process.env.CI ? 180000 : 120000);
 
   const projectPage = new ProjectPage(page);
@@ -11,15 +11,15 @@ test('Create Project and complete project flow', async ({ page }) => {
 
   let projectTitle;
 
-  await test.step('Create project', async () => {
+  await test.step('TC-03.1 Create a new project', async () => {
     ({ projectTitle } = await projectPage.createProject());
   });
 
-  await test.step('Complete project details flow', async () => {
+  await test.step('TC-03.2 – TC-03.4 Tags, full detail flow & Activities tab', async () => {
     await projectPage.completeProjectFlow();
   });
 
-  await test.step('Open created project', async () => {
+  await test.step('TC-03.5 Open created project from list', async () => {
     await page.getByRole('link', { name: projectTitle }).first().click();
   });
 });

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 import { TasksPage } from '../pages/TasksPage';
 
-test('Create, verify, filter and delete a task', async ({ page }) => {
+test('TC-06 — Tasks', async ({ page }) => {
   test.setTimeout(process.env.CI ? 180000 : 120000);
 
   const tasksPage = new TasksPage(page);
@@ -11,11 +11,11 @@ test('Create, verify, filter and delete a task', async ({ page }) => {
 
   let taskData;
 
-  await test.step('Create a task with dates, status, time and description', async () => {
+  await test.step('TC-06.1 Create a task with full field set', async () => {
     taskData = await tasksPage.createTask();
   });
 
-  await test.step('Reopen the task and verify saved field values', async () => {
+  await test.step('TC-06.2 Reopen task and verify saved values', async () => {
     await tasksPage.openTaskByTitle(taskData.title);
     const fieldValues = await tasksPage.getTaskFieldValues();
 
@@ -32,18 +32,18 @@ test('Create, verify, filter and delete a task', async ({ page }) => {
     await tasksPage.closeTaskModal();
   });
 
-  await test.step('Toggle "Show completed tasks"', async () => {
+  await test.step('TC-06.3 Toggle "Show completed tasks"', async () => {
     const { checkedBefore, checkedAfter } = await tasksPage.toggleShowCompletedTasks();
     expect(checkedAfter).not.toBe(checkedBefore);
   });
 
-  await test.step('Quick-add a task from the inline row', async () => {
+  await test.step('TC-06.4 – TC-06.5 Quick-add and delete a task', async () => {
     const quickTitle = `Quick-${Date.now()}`;
     await tasksPage.quickAddTask(quickTitle);
     await tasksPage.deleteTask(quickTitle);
   });
 
-  await test.step('Delete the original task', async () => {
+  await test.step('TC-06.5 Delete the original task', async () => {
     await tasksPage.deleteTask(taskData.title);
   });
 });

@@ -1,0 +1,256 @@
+id,title,description,preconditions,postconditions,tags,priority,severity,type,behavior,automation,status,is_flaky,layer,steps_type,steps_actions,steps_result,steps_data,milestone_id,milestone,suite_id,suite_parent_id,suite,suite_without_cases,parameters,is_muted
+,,,,,,,,,,,,,,,,,,,,1,,Login,1
+,,,,,,,,,,,,,,,,,,,,2,,"Funnel, Idea & Kanban",1
+,,,,,,,,,,,,,,,,,,,,3,,Project,1
+,,,,,,,,,,,,,,,,,,,,4,,Automation Rules,1
+,,,,,,,,,,,,,,,,,,,,5,,Branding,1
+,,,,,,,,,,,,,,,,,,,,6,,Tasks,1
+1,"Login - [empty email and password]",,"User is on the /login page.","User remains unauthenticated.","login,negative",normal,normal,regression,negative,automated,actual,no,e2e,classic,"1. Navigate to /login.
+2. Leave the email field empty.
+3. Leave the password field empty.
+4. Click Login.
+","1. Login is rejected and the user remains on the login page.
+","URL: https://automationqa-7082.acceptmission.com/login
+Email: (blank)
+Password: (blank)
+",,,1,,Login,,,no
+2,"Login - [invalid credentials]",,"User is on the /login page.","User remains unauthenticated.","login,negative",normal,normal,regression,negative,automated,actual,no,e2e,classic,"1. Navigate to /login.
+2. Enter an invalid email (wrong@test.com).
+3. Enter an invalid password (WrongPassword).
+4. Click Login.
+","1. Login is rejected and the user remains on the login page.
+","URL: https://automationqa-7082.acceptmission.com/login
+Email: wrong@test.com
+Password: WrongPassword
+",,,1,,Login,,,no
+3,"Login - [valid credentials]",,"User is on the /login page and holds a valid, registered account.","User is authenticated and lands inside the app.","login,positive,smoke",high,critical,smoke,positive,automated,actual,no,e2e,classic,"1. Navigate to /login.
+2. Enter a valid, registered email.
+3. Enter the matching valid password.
+4. Click Login.
+","1. User is authenticated and navigated away from /login.
+","URL: https://automationqa-7082.acceptmission.com/login
+Email: acceptqatest+automationtest80@mailinator.com
+Password: Testing123!
+",,,1,,Login,,,no
+4,"Funnel - [create a new idea funnel]",,"User is authenticated.","Funnel exists and is saved server-side.",funnel,high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Open Tools > Funnels.
+2. Click Create idea funnel.
+3. Enter a unique funnel name.
+4. Click Save.
+5. Click View Ideas.
+","1.
+2.
+3.
+4.
+5. Funnel is created and saved server-side; app navigates to the funnel's Kanban view (/studio/funnels/{id}?view=kanban).
+","Base URL: https://automationqa-7082.acceptmission.com/
+Funnel name: Funnel-<timestamp> (auto-generated)
+",,,2,,"Funnel, Idea & Kanban",,,no
+5,"Idea - [create an idea inside the funnel]",,"A funnel exists and is open.","Idea exists inside the funnel.","funnel,idea",high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Click Add idea.
+2. Choose Enter manually (if prompted).
+3. Enter a title and description.
+4. Close the dialog.
+","1.
+2.
+3.
+4. Idea is created with the given title and description.
+","Idea title: Idea-<timestamp> (auto-generated)
+Idea description: IdeaDes-<timestamp> (auto-generated)
+",,,2,,"Funnel, Idea & Kanban",,,no
+6,"Idea - [complete full idea detail flow]",,"An idea exists and is open.","All idea sub-sections are populated.","idea,details",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Fill Details (department, notes).
+2. Add Work task (phase, date, description).
+3. Publish Canvas (filename + status message).
+4. Add Problem (name, impacted user, statement, evidence).
+5. Add Assumption.
+6. Add Experiment (hypothesis, method, success metric, outcome, decision, notes).
+7. Add Risk (title, mitigation, notes).
+8. Add Decision (title, description, rationale, alternatives, notes).
+9. Add Lesson (title, summary, learnings, context, what worked/didn't, recommendation).
+10. Add Comments (internal + portal).
+11. Add Team member via user picker.
+12. Add Link (title + URL), set status to Submitted, Follow, Like.
+","1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10.
+11.
+12. Every section saves without error; each sub-entity is persisted and the idea's status/follow/like state updates.
+","Department: General
+All free-text field values (Note, Task, Phase, Description, Canvas filename/message, Problem, Assumption, Experiment, Risk, Decision, Lesson, Comment) are auto-generated via generateRandomName(prefix) at runtime.
+Link URL: https://google.com
+Idea status set to: Submitted
+",,,2,,"Funnel, Idea & Kanban",,,no
+7,"Kanban - [move idea through stages]",,"Idea exists in the funnel's Kanban board.","Idea sits in the final lane it was dragged to.","kanban,dnd",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Drag idea card to 'Review idea' lane.
+2. Drag idea card to 'Create proposal' lane.
+3. Drag idea card to 'Approved proposal' lane.
+4. Drag idea card to 'Denied proposal' lane.
+","1.
+2.
+3.
+4. The idea card moves to and is visible in each lane in sequence.
+","Lanes (in order): Review idea, Create proposal, Approved proposal, Denied proposal
+",,,2,,"Funnel, Idea & Kanban",,,no
+8,"Project - [create a new project]",,"User is authenticated.","Project exists.",project,high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Open Projects > Add project.
+2. Enter a unique title and description.
+","1.
+2. Project is created with the given title/description.
+","Project title: Project-<timestamp> (auto-generated)
+Project description: ProjectDes-<timestamp> (auto-generated)
+",,,3,,Project,,,no
+9,"Project - [add and toggle a tag]",,"A project exists and is open.","Tag was added and then removed without error.","project,tags",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Enter a new tag name in the tag input.
+2. Confirm no suggestions exist, click Create <tag>.
+3. From Suggested tags, select the first suggested tag.
+4. Remove the selected suggested tag.
+","1.
+2.
+3.
+4. Tag is created and attached; suggested tag can be added and removed without error.
+","Tag name: Tag-<timestamp> (auto-generated)
+",,,3,,Project,,,no
+10,"Project - [complete full project detail flow]",,"A project exists and is open.","All project sub-sections are populated.","project,details",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Fill Details (department, notes).
+2. Add Task (phase, description).
+3. Publish Canvas (filename + status message).
+4. Add Problem (name, impacted user, statement, evidence).
+5. Add Assumption.
+6. Add Experiment (hypothesis, method, success metric, outcome, decision, notes).
+7. Add Risk (title, mitigation, notes).
+8. Add Decision (title, description, rationale, alternatives, notes).
+9. Add Lesson (title, summary, learnings, context, what worked/didn't, recommendation).
+10. Add Comment.
+","1.
+2.
+3.
+4.
+5.
+6.
+7.
+8.
+9.
+10. Every section saves without error, matching Idea-level detail coverage.
+","Department: General
+All free-text field values (Note, Task, Phase, Description, Canvas filename/message, Problem, Assumption, Experiment, Risk, Decision, Lesson, Comment) are auto-generated via generateRandomName(prefix) at runtime.
+",,,3,,Project,,,no
+11,"Project - [view Activities tab]","Known issue: Activities tab currently returns 404.","A project exists and is open.","N/A - known defect.","project,known-issue",normal,major,regression,negative,automated,draft,no,e2e,classic,"1. Click the Activities tab.
+","1. Known issue: currently returns a 404 instead of loading the Activities tab.
+","Route: Activities tab within the open project (returns HTTP 404)
+",,,3,,Project,,,yes
+12,"Project - [open created project from list]",,"A project exists in the projects list.","Project detail page is open.",project,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Click the project's title link from the projects list.
+","1. Project detail page opens for the correct project.
+","Project title link: matches the title created in 'Project - [create a new project]'
+",,,3,,Project,,,no
+13,"Automation - [create a dedicated funnel for the rule]",,"User is authenticated.","A fresh, isolated funnel exists.","automation,funnel",high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Create a fresh funnel isolated from any existing active rules.
+","1. Funnel created; its display name is captured for later steps.
+","Funnel name: Funnel-<timestamp> (auto-generated)
+",,,4,,Automation Rules,,,no
+14,"Automation - [navigate to Automations]",,"User is authenticated.","Automations list page is open.",automation,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Go to Settings > Automation > Automations.
+","1. Automations list page loads.
+","Navigation: Settings > Automation > Automations
+",,,4,,Automation Rules,,,no
+15,"Automation - [create and configure a rule]",,"A dedicated funnel exists.","Rule is created and saved.","automation,rule",high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Click Add rule, name it, enable it.
+2. Set trigger funnel to the dedicated funnel.
+3. Set condition: Department = General.
+4. Set action: move to a target lane.
+5. Save.
+","1.
+2.
+3.
+4.
+5. Rule is created, scoped to the correct funnel, and saved with the configured condition/action.
+","Rule name: AutomationRule-<timestamp> (auto-generated)
+Trigger funnel: the funnel from 'Automation - [create a dedicated funnel for the rule]'
+Condition: Department = General
+Action: Move to lane (second/non-default option in Select lane)
+",,,4,,Automation Rules,,,no
+16,"Automation - [search and toggle rule status]",,"A rule exists.","Rule's enabled/disabled state is flipped.","automation,rule",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Search rules by name.
+2. Toggle the rule's enabled/disabled switch.
+","1.
+2. Rule's status toggles as expected.
+","Search text: the rule name from 'Automation - [create and configure a rule]'
+",,,4,,Automation Rules,,,no
+17,"Automation - [create an idea in the scoped funnel]",,"A rule and its dedicated funnel exist.","Idea exists inside the scoped funnel.","automation,idea",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Switch to the dedicated funnel (if not already active).
+2. Create a new idea.
+3. Set the idea's Department and Funnel fields to match the rule's scope.
+","1.
+2.
+3. Idea is created inside the correct funnel.
+","Idea title: Idea-<timestamp> (auto-generated)
+Department: General
+Funnel: the dedicated funnel from 'Automation - [create a dedicated funnel for the rule]'
+",,,4,,Automation Rules,,,no
+18,"Automation - [verify rule triggers on idea update]",,"An idea exists inside the rule's scoped funnel.","Automation rule fires per its configured condition.","automation,rule",high,major,regression,positive,automated,actual,no,e2e,classic,"1. Update the idea's title.
+2. Confirm the automation rule reacts per its configured condition/action.
+","1.
+2. Idea title updates; automation rule fires per its configured condition.
+","New idea title: <original idea title>-updated
+",,,4,,Automation Rules,,,no
+19,"Branding - [apply company branding]",,"User is authenticated and has branding admin access.","Branding changes are saved.",branding,high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Go to Settings > Branding.
+2. Upload a logo image and crop/save.
+3. Upload a square logo image and crop/save.
+4. Set brand color via hex input.
+5. Click Save.
+","1.
+2.
+3.
+4.
+5. 'Branding updated.' confirmation toast appears; changes are saved.
+","URL: https://automationqa-7082.acceptmission.com/settings/branding
+Logo file: test-data/test-icon.avif
+Square logo file: test-data/logo.jpg
+Brand color: #4F46E5
+",,,5,,Branding,,,no
+20,"Branding - [reset discards unsaved changes]",,"User is on the Branding page.","Brand color is unchanged from before the edit.","branding,reset",normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Go to Branding.
+2. Record the current brand color.
+3. Change the color (without saving).
+4. Click Reset.
+","1.
+2.
+3.
+4. Color reverts to the value recorded before the edit; the unsaved change is discarded.
+","URL: https://automationqa-7082.acceptmission.com/settings/branding
+Unsaved test color: #123456
+",,,5,,Branding,,,no
+21,"Tasks - [create a task with full field set]",,"User is authenticated.","Task exists with all fields populated.",tasks,high,normal,regression,positive,automated,actual,no,e2e,classic,"1. Open Tasks > Add task.
+2. Enter title and phase.
+3. Set due date and start date.
+4. Set status to Completed.
+5. Set estimated time (2h 30m) and spent time (1h 45m).
+6. Enter a description.
+7. Save.
+","1.
+2.
+3.
+4.
+5.
+6.
+7. Task is created and persisted with all field values.
+","Title: Task-<timestamp> (auto-generated)
+Phase: Phase-<timestamp> (auto-generated)
+Status: Completed
+Estimated time: 2h 30m
+Spent time: 1h 45m
+Description: Description-<timestamp> (auto-generated)
+",,,6,,Tasks,,,no
+22,"Tasks - [reopen task and verify saved values]",,"A completed task exists.","Task fields verified to match what was saved.",tasks,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Enable Show completed tasks.
+2. Search for the task by title.
+3. Open it.
+","1.
+2.
+3. Title, phase, estimated/spent hours & minutes, and description all match what was saved.
+","Task title: matches the task created in 'Tasks - [create a task with full field set]'
+",,,6,,Tasks,,,no
+23,"Tasks - [toggle Show completed tasks]",,"User is on the Tasks page with the filter panel open.","Switch state is flipped from its prior value.",tasks,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Toggle the switch and read its checked state before/after.
+","1. Checked state flips (before is not equal to after).
+",,,,6,,Tasks,,,no
+24,"Tasks - [quick-add a task]",,"User is on the Tasks page.","New task row exists in the list.",tasks,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Type a title into the inline 'New task' row and press Enter.
+","1. Task row appears immediately in the list.
+","Title: Quick-<timestamp> (auto-generated)
+",,,6,,Tasks,,,no
+25,"Tasks - [delete a task]",,"A task exists in the list.","Task no longer appears in the list.",tasks,normal,normal,regression,positive,automated,actual,no,e2e,classic,"1. Open a task and click Delete, confirming the browser dialog.
+","1. Task row is removed from the list.
+","Task title: the quick-added task or the original task from 'Tasks - [create a task with full field set]'
+",,,6,,Tasks,,,no

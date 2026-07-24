@@ -51,7 +51,12 @@ export class BrandingPage {
   async setBrandColor(hexColor) {
     await this.colorButton.click();
 
-    await this.colorHexInput.click();
+    // The color popover is fixed-position (not inside a scrollable container),
+    // so at some viewport sizes (e.g. CI's fixed 1920x1080 vs a locally
+    // maximized window) Playwright's auto-scroll can't bring it fully into
+    // view even though it's visible/enabled/stable — force the click rather
+    // than let the actionability check hang on an unsolvable scroll.
+    await this.colorHexInput.click({ force: true });
     await this.colorHexInput.press('Control+a');
     await this.colorHexInput.pressSequentially(hexColor);
     await this.colorHexInput.press('Tab');

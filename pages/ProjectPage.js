@@ -1,4 +1,4 @@
-import { generateRandomName } from '../utils/helper.js';
+import { generateRandomName, fillRichText } from '../utils/helper.js';
 
 export class ProjectPage {
   constructor(page) {
@@ -13,7 +13,7 @@ export class ProjectPage {
 
     // Project title / description
     this.projectTitleInput = page.getByRole('textbox', { name: 'Title' });
-    this.projectDescriptionBox = page.getByRole('dialog', { name: 'Edit title & description' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+    this.projectDescriptionBox = page.getByRole('dialog', { name: 'Edit title & description' }).locator('[contenteditable="true"]');
 
     // Tags
     this.tagInput = page.getByRole('textbox', { name: 'Tag input' });
@@ -33,7 +33,7 @@ export class ProjectPage {
 
     // Details
     this.detailsTab = page.getByRole('tab', { name: 'Details' });
-    this.detailsNote = page.getByRole('tabpanel', { name: 'Details' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+    this.detailsNote = page.getByRole('tabpanel', { name: 'Details' }).locator('[contenteditable="true"]');
     this.departmentButton = page.getByRole('button', { name: 'Select department' });
     this.generalDepartment = page.getByRole('button', { name: /General/ });
 
@@ -42,7 +42,7 @@ export class ProjectPage {
     this.addTaskBtn = page.getByRole('button', { name: 'Add task' });
     this.taskTitle = page.getByRole('textbox', { name: 'Title' });
     this.taskPhase = page.getByRole('textbox', { name: 'Phase' });
-    this.taskDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('iframe[title="Rich Text Area"]').contentFrame().getByLabel('Rich Text Area. Press ALT-0');
+    this.taskDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('[contenteditable="true"]');
 
     // Canvas
     this.canvasButton = page.getByRole('button', { name: 'Canvases' });
@@ -126,8 +126,7 @@ export class ProjectPage {
     await this.projectTitleInput.click();
     await this.projectTitleInput.fill(projectTitle);
 
-    await this.projectDescriptionBox.click();
-    await this.projectDescriptionBox.fill(generateRandomName('ProjectDes'));
+    await fillRichText(this.page, this.projectDescriptionBox, generateRandomName('ProjectDes'), 'project-description');
 
     console.log('✅ Project has been created successfully...');
 
@@ -190,8 +189,7 @@ export class ProjectPage {
     await this.departmentButton.click();
     await this.generalDepartment.click();
 
-    await this.detailsNote.click();
-    await this.detailsNote.fill(detailsNote);
+    await fillRichText(this.page, this.detailsNote, detailsNote, 'project-details-note');
 
     console.log('✅ Details section has been filled successfully...');
   }
@@ -208,7 +206,7 @@ export class ProjectPage {
 
     await this.taskTitle.fill(taskTitle);
     await this.taskPhase.fill(taskPhase);
-    await this.taskDescription.fill(taskDescription);
+    await fillRichText(this.page, this.taskDescription, taskDescription, 'project-work-task-description');
 
     await this.addTaskBtn.click();
 
