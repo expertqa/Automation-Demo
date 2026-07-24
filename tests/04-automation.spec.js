@@ -1,8 +1,9 @@
 import { test } from '@playwright/test';
+import { qase } from 'playwright-qase-reporter/playwright';
 
 import { AutomationPage } from '../pages/AutomationPage';
 
-test('TC-04 — Automation Rules', async ({ page }) => {
+test(qase([13, 14, 15, 16, 17, 18], 'TC-04 — Automation Rules'), async ({ page }) => {
   test.setTimeout(process.env.CI ? 240000 : 180000);
 
   const automationPage = new AutomationPage(page);

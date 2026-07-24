@@ -1,11 +1,12 @@
 import {test} from '@playwright/test';
+import {qase} from 'playwright-qase-reporter/playwright';
 import {LoginPage} from '../pages/LoginPage';
 import users from '../data/users.json' with {type: 'json'};
 import config from '../config/qa.json' with {type: 'json'};
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('TC-01 — Login', async({page}) => {
+test(qase([1, 2, 3], 'TC-01 — Login'), async({page}) => {
 
     const login = new LoginPage(page);
 
