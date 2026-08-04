@@ -1,16 +1,18 @@
 import {test} from '@playwright/test';
-import {qase} from 'playwright-qase-reporter/playwright';
 import {LoginPage} from '../pages/LoginPage';
 import users from '../data/users.json' with {type: 'json'};
 import config from '../config/qa.json' with {type: 'json'};
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test(qase([1, 2, 3], 'TC-01 — Login'), async({page}) => {
+test('TC-01 — Login', async({page}) => {
 
     const login = new LoginPage(page);
 
-    await page.goto(config.paths.login);
+    // This SPA keeps background connections open (chat widget, polling, etc.),
+    // so the default 'load' event can hang well past 30s even though the login
+    // form itself is interactive almost immediately — wait for DOM content only.
+    await page.goto(config.paths.login, { waitUntil: 'domcontentloaded' });
 
     await test.step('TC-01.1 Login with empty email and password', async () => {
         await login.loginWithEmptyFields(

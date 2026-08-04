@@ -28,18 +28,6 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['playwright-qase-reporter', {
-      mode: 'testops',
-      testops: {
-        api: {
-          token: process.env.QASE_TESTOPS_API_TOKEN,
-        },
-        project: 'AD001',
-        run: {
-          complete: true,
-        },
-      },
-    }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

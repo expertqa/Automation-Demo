@@ -60,7 +60,7 @@ export class AutomationPage {
 
     // Idea link by title (dynamic)
     this.ideaLinkByTitle = (ideaTitle) => page.getByRole('link', { name: ideaTitle, exact: true });
-    this.searchIdeasTextbox = page.getByRole('textbox', { name: 'Search ideas' });
+    this.searchIdeasTextbox = page.getByRole('textbox', { name: 'Search ideas', exact: true });
   }
 
   //selectComboboxOption

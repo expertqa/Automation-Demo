@@ -18,6 +18,11 @@ export default async function globalSetup(playwrightConfig) {
   await page.goto(config.paths.login, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await login.login(users.user.email, users.user.password);
 
+  // Clicking "Sign in" resolves as soon as the click registers, not once the
+  // session cookie is actually set — capture storageState too early and it
+  // saves a pre-auth state, leaving every dependent test back on /login.
+  await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 60000 });
+
   await context.storageState({ path: 'state.json' });
   await browser.close();
 }

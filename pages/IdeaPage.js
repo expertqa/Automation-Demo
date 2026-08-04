@@ -35,7 +35,7 @@ this.taskTitle = page.getByRole('textbox', { name: 'Title' });
 this.addPhase = page.getByRole('textbox', { name: 'Phase' });
 this.datePicker = page.getByRole('button', { name: 'Pick a date' }).nth(1);
 this.selectDate = page.getByRole('gridcell', { name: '8', exact: true });
-this.addDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('[contenteditable="true"]');
+this.addDescription = page.getByRole('dialog', { name: 'Add task' }).locator('[contenteditable="true"]');
 
 // Canvas
 this.canvasButton = page.locator('button').filter({ hasText: /^Canvases/ });

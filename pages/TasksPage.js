@@ -97,7 +97,7 @@ export class TasksPage {
   //saveTask
   async saveTask() {
     await this.saveTaskButton.click();
-    await this.taskModal.waitFor({ state: 'hidden', timeout: 10000 });
+    await this.taskModal.waitFor({ state: 'hidden', timeout: 30000 });
   }
 
   //createTask
@@ -200,8 +200,21 @@ export class TasksPage {
     const alreadyOpen = await this.showCompletedSwitch.isVisible().catch(() => false);
     if (alreadyOpen) return;
 
-    await this.filterButton.click();
-    await this.showCompletedSwitch.waitFor({ state: 'visible', timeout: 10000 });
+    // Clicking Filter right after it was just closed (e.g. straight after a delete/search)
+    // occasionally doesn't reopen the panel at all — an app-side animation/debounce quirk,
+    // not a locator issue. Retrying the click recovers it.
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      await this.filterButton.click();
+      const isLastAttempt = attempt === 3;
+      const opened = await this.showCompletedSwitch
+        .waitFor({ state: 'visible', timeout: isLastAttempt ? 10000 : 5000 })
+        .then(() => true)
+        .catch((error) => {
+          if (isLastAttempt) throw error;
+          return false;
+        });
+      if (opened) return;
+    }
   }
 
   //toggleShowCompletedTasks

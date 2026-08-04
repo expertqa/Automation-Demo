@@ -1,9 +1,8 @@
 import { test } from '@playwright/test';
-import { qase } from 'playwright-qase-reporter/playwright';
 
 import { ProjectPage } from '../pages/ProjectPage';
 
-test(qase([8, 9, 10, 11, 12], 'TC-03 — Project'), async ({ page }) => {
+test('TC-03 — Project', async ({ page }) => {
   test.setTimeout(process.env.CI ? 180000 : 120000);
 
   const projectPage = new ProjectPage(page);

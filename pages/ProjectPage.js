@@ -42,7 +42,7 @@ export class ProjectPage {
     this.addTaskBtn = page.getByRole('button', { name: 'Add task' });
     this.taskTitle = page.getByRole('textbox', { name: 'Title' });
     this.taskPhase = page.getByRole('textbox', { name: 'Phase' });
-    this.taskDescription = page.getByRole('dialog', { name: '✔️ Add task' }).locator('[contenteditable="true"]');
+    this.taskDescription = page.getByRole('dialog', { name: 'Add task' }).locator('[contenteditable="true"]');
 
     // Canvas
     this.canvasButton = page.getByRole('button', { name: 'Canvases' });
@@ -413,7 +413,6 @@ export class ProjectPage {
   async viewActivities() {
     await this.activitiesTab.click();
     console.log('✅ Activities tab has been opened successfully...');
-    console.log('❌ Issues Detected - 404 Page Not Found...');
   }
 
   //completeProjectFlow
