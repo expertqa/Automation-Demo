@@ -1,10 +1,11 @@
 import { test } from '@playwright/test';
+import { qase } from 'playwright-qase-reporter/playwright';
 
 import { FunnelPage } from '../pages/FunnelPage';
 import { IdeaPage } from '../pages/IdeaPage';
 import { KanbanPage } from '../pages/IdeaKanabanPage.js';
 
-test('TC-02 — Funnel, Idea & Kanban', async ({ page }) => {
+test(qase([4, 5, 6, 7], 'TC-02 — Funnel, Idea & Kanban'), async ({ page }) => {
   test.setTimeout(process.env.CI ? 180000 : 120000);
 
   const funnelPage = new FunnelPage(page);
