@@ -5,7 +5,7 @@ export class LoginPage {
         //Login locators
         this.emailInput = "#email";
         this.passwordInput = "#password";
-        this.logInButton = page.getByRole('button', { name: 'Sign in' });
+        this.logInButton = page.getByTestId('login-submit-button');
 
     }
 
