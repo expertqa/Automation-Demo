@@ -9,6 +9,8 @@ export class ProjectPage {
 
     // Navigation
     this.projectsButton = page.getByRole('button', { name: 'Projects' });
+    this.projectDropdown = page.getByRole('combobox').first();
+    this.selectProjectFunnel = page.getByRole('option', { name: 'New Project funnel' });
     this.addProjectButton = page.getByRole('button', { name: 'Add project' });
 
     // Project title / description
@@ -121,6 +123,8 @@ export class ProjectPage {
     const projectTitle = generateRandomName('Project');
 
     await this.projectsButton.click();
+    await this.projectDropdown.click();
+    await this.selectProjectFunnel.click();
     await this.addProjectButton.click();
 
     await this.projectTitleInput.click();

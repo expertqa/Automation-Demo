@@ -8,7 +8,8 @@ export class IdeaPage {
     this.page = page;
 
     // Create Idea
-this.addIdeaButton = page.getByRole('button', { name: 'Add idea', exact: true }).first();
+// Case-insensitive: the button's label has changed casing before ("Add idea" vs "Add Idea").
+this.addIdeaButton = page.getByRole('button', { name: /^Add idea$/i }).first();
 this.enterManuallyButton = page.getByRole('button', { name: 'Enter manually' });
 this.ideaTitleTextbox = page.getByRole('textbox', {
   name: 'Title'
