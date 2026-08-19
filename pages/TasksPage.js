@@ -253,7 +253,9 @@ export class TasksPage {
     await this.quickAddTitleTextbox.fill(title);
     await this.quickAddTitleTextbox.press('Enter');
 
-    await this.taskRowByTitle(title).waitFor({ state: 'visible', timeout: 10000 });
+    // Insert-then-refetch latency here has been observed to exceed 10s
+    // (row confirmed appearing within ~20s), so 10s alone is too tight.
+    await this.taskRowByTitle(title).waitFor({ state: 'visible', timeout: 30000 });
 
     console.log('✅ Task has been quick-added successfully...');
   }

@@ -225,6 +225,7 @@ export class AutomationPage {
 
     await ideaLink.click();
 
+    await this.ideaTitleButton.waitFor({ state: 'visible', timeout: 30000 });
     await this.ideaTitleButton.click();
     await this.ideaTitleTextbox.click();
     await this.ideaTitleTextbox.fill(newIdeaTitle);

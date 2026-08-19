@@ -3,7 +3,10 @@ import { test } from '@playwright/test';
 import { AutomationPage } from '../pages/AutomationPage';
 
 test('TC-04 — Automation Rules', async ({ page }) => {
-  test.setTimeout(process.env.CI ? 240000 : 180000);
+  // The idea-search wait in updateIdeaTitle() alone can take up to 120s on
+  // slower QA infra, so the overall budget needs real headroom beyond that
+  // for the rest of the steps, not just enough to cover it exactly.
+  test.setTimeout(process.env.CI ? 300000 : 240000);
 
   const automationPage = new AutomationPage(page);
 

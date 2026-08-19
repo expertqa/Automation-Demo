@@ -11,7 +11,11 @@ export class ProjectPage {
     this.projectsButton = page.getByRole('button', { name: 'Projects' });
     this.projectDropdown = page.getByRole('combobox').first();
     this.selectProjectFunnel = page.getByRole('option', { name: 'New Project funnel' });
-    this.addProjectButton = page.getByRole('button', { name: 'Add project' });
+    // Scoped by id: the app added a second "Add project" button
+    // (#add-project-button, an empty-state CTA that isn't reliably present)
+    // alongside the original menu-trigger that opens the creation dialog
+    // (#add-project-menu-button), making the name alone ambiguous.
+    this.addProjectButton = page.locator('#add-project-menu-button');
 
     // Project title / description
     this.projectTitleInput = page.getByRole('textbox', { name: 'Title' });
