@@ -14,6 +14,9 @@ test('TC-07 — Campaign', async ({ page }) => {
 
   await test.step('TC-07.1 Create a new campaign', async () => {
     ({ campaignTitle } = await campaignPage.createCampaign());
+
+    expect(campaignTitle, 'createCampaign() should return the title it used').toBeTruthy();
+    await expect(page, 'Should land on the new campaign\'s manage page').toHaveURL(/\/studio\/campaign\/\d+/);
   });
 
   await test.step('TC-07.2 Fill campaign description and participant briefing', async () => {

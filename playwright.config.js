@@ -39,6 +39,10 @@ export default defineConfig({
     headless: !!process.env.CI,
     channel: "",
     locale: 'en-US',
+    /* Pinned so date-dependent flows (date pickers, "Today" selection, due
+       dates) behave identically regardless of which machine/CI region runs
+       the tests, instead of inheriting whatever timezone the host happens to have. */
+    timezoneId: 'UTC',
 
     /* Every test starts with the authenticated state produced by globalSetup. */
     storageState: 'state.json',

@@ -47,8 +47,11 @@ async createFunnel() {
   // it server-side (the funnel then never becomes searchable elsewhere, e.g.
   // as an automation rule's trigger scope) — Save must be clicked explicitly first.
   await this.saveFunnelButton.click();
-  await this.page.waitForTimeout(1000);
 
+  // No hard wait here: Save gives no visible signal (button state and text
+  // are unchanged whether or not it has actually landed server-side), so the
+  // only real condition available is the outcome we actually care about —
+  // landing on the funnel's kanban URL, waited on below.
   await Promise.all([
     this.page.waitForURL(/\/studio\/funnels\/\d+\?view=kanban/, { timeout: 30000 }),
     this.viewIdeasLink.click({ timeout: 30000 }),

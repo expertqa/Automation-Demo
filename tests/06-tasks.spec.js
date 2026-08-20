@@ -3,7 +3,14 @@ import { test, expect } from '@playwright/test';
 import { TasksPage } from '../pages/TasksPage';
 
 test('TC-06 — Tasks', async ({ page }) => {
-  test.setTimeout(process.env.CI ? 180000 : 120000);
+  // Confirmed live: successful runs already take 1.5-2min end-to-end on this
+  // environment's current latency, leaving almost no margin under the old
+  // 120s local budget. When the overall test timeout hits, Playwright blames
+  // whatever action happened to be in-flight at that moment — a different,
+  // unrelated locator each time — which looks like a rotating cast of broken
+  // clicks but is really just the outer clock running out. Fix the budget,
+  // not each red-herring locator it happens to land on.
+  test.setTimeout(process.env.CI ? 240000 : 180000);
 
   const tasksPage = new TasksPage(page);
 
@@ -13,6 +20,9 @@ test('TC-06 — Tasks', async ({ page }) => {
 
   await test.step('TC-06.1 Create a task with full field set', async () => {
     taskData = await tasksPage.createTask();
+
+    expect(taskData.title, 'Created task should have a title').toBeTruthy();
+    expect(taskData.phase, 'Created task should have a phase').toBeTruthy();
   });
 
   await test.step('TC-06.2 Reopen task and verify saved values', async () => {
@@ -39,11 +49,17 @@ test('TC-06 — Tasks', async ({ page }) => {
 
   await test.step('TC-06.4 – TC-06.5 Quick-add and delete a task', async () => {
     const quickTitle = `Quick-${Date.now()}`;
+
     await tasksPage.quickAddTask(quickTitle);
+    await expect(tasksPage.taskRowByTitle(quickTitle), 'Quick-added task should appear in the list').toBeVisible();
+
     await tasksPage.deleteTask(quickTitle);
+    await expect(tasksPage.taskRowByTitle(quickTitle), 'Quick-added task should be gone after deletion').not.toBeAttached();
   });
 
   await test.step('TC-06.5 Delete the original task', async () => {
     await tasksPage.deleteTask(taskData.title);
+
+    await expect(tasksPage.taskRowByTitle(taskData.title), 'Original task should be gone after deletion').not.toBeAttached();
   });
 });

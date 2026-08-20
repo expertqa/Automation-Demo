@@ -9,6 +9,12 @@ export class ProjectPage {
 
     // Navigation
     this.projectsButton = page.getByRole('button', { name: 'Projects' });
+    // The default projects list doesn't reliably surface a just-created
+    // project (confirmed live: default view showed only much older projects,
+    // not one created seconds earlier) — same "list lags behind creation"
+    // pattern as Tasks. Search for it explicitly instead of assuming it's
+    // already visible.
+    this.searchProjectsTextbox = page.getByRole('textbox', { name: 'Search projects' });
     this.projectDropdown = page.getByRole('combobox').first();
     this.selectProjectFunnel = page.getByRole('option', { name: 'New Project funnel' });
     // Scoped by id: the app added a second "Add project" button
@@ -103,7 +109,10 @@ export class ProjectPage {
 
     // Lessons
     this.lessonsButton = page.getByRole('button', { name: 'Lessons' });
-    this.addLessonButton = page.locator('button').filter({ hasText: /^Add lesson$/ });
+    // .last(): on an empty Lessons section the app shows an extra empty-state
+    // "Add lesson" CTA alongside the section's real button (confirmed live) —
+    // the same duplicate-button pattern already seen on "Add project".
+    this.addLessonButton = page.locator('button').filter({ hasText: /^Add lesson$/ }).last();
     this.addLessonTitle = page.getByRole('textbox', { name: 'Lesson title' });
     this.addLessonSummary = page.getByRole('textbox', { name: 'Short summary' });
     this.addLessonLearn = page.getByRole('textbox', { name: 'What did we learn' });

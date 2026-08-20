@@ -1,4 +1,4 @@
-import {test} from '@playwright/test';
+import {test, expect} from '@playwright/test';
 import {LoginPage} from '../pages/LoginPage';
 import users from '../data/users.json' with {type: 'json'};
 import config from '../config/qa.json' with {type: 'json'};
@@ -19,13 +19,18 @@ test('TC-01 — Login', async({page}) => {
             users.emptyUser.email,
             users.emptyUser.password,
         );
+
+        await expect(page, 'Empty credentials should be rejected — user stays on /login').toHaveURL(/\/login/);
     });
-//fdjghjdfg
+
     await test.step('TC-01.2 Login with invalid credentials', async () => {
         await login.loginInvalidData(
             users.invalidUser.email,
             users.invalidUser.password,
         );
+
+        await expect(page, 'Invalid credentials should be rejected — user stays on /login').toHaveURL(/\/login/);
+        await expect(page.getByText('We could not sign you in'), 'An invalid-login error message should be shown').toBeVisible();
     });
 
     await test.step('TC-01.3 Login with valid credentials', async () => {
@@ -33,6 +38,8 @@ test('TC-01 — Login', async({page}) => {
             users.user.email,
             users.user.password
         );
+
+        await expect(page, 'Valid credentials should log the user in and leave /login').not.toHaveURL(/\/login/);
     });
 
 })

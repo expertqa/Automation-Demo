@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import { generateRandomName } from '../utils/helper.js';
 import { IdeaPage } from './IdeaPage.js';
 import { FunnelPage } from './FunnelPage.js';
@@ -21,7 +22,13 @@ export class AutomationPage {
 
     // Rule search / toggle
     this.searchRulesTextbox = page.getByRole('textbox', { name: 'Search rules' });
-    this.ruleDisabledSwitch = page.getByRole('switch', { name: 'Disabled' });
+    // Not name-bound: confirmed live that this switch's aria-label itself
+    // flips with its state (e.g. "Disabled" <-> something else), so a
+    // locator bound to name: 'Disabled' stops matching anything the moment
+    // it's toggled. Search narrows the list to the one target rule first,
+    // so .first() reliably stays the same physical element regardless of
+    // its label text.
+    this.ruleDisabledSwitch = page.getByRole('switch').first();
 
     // Ideas navigation / idea edit
     this.ideasButton = page.getByRole('button', { name: 'Ideas' });
@@ -36,9 +43,6 @@ export class AutomationPage {
       'xpath=//*[normalize-space(text())="Funnel"][not(ancestor::table)]/following::button[@role="combobox"][1]'
     );
     this.suggestionsFirstOption = page.getByLabel('Suggestions').getByRole('option').first();
-    // The first option in these "Suggestions" listboxes is usually the current/
-    // default value (e.g. the lane a "move to lane" action already points at),
-    // so picking the second gives a genuinely different target.
     this.suggestionsSecondOption = page.getByLabel('Suggestions').getByRole('option').nth(1);
     this.suggestionOptionByName = (name) => page.getByLabel('Suggestions').getByRole('option', { name, exact: true });
 
@@ -54,8 +58,6 @@ export class AutomationPage {
     this.funnelSearchTextbox = page.getByPlaceholder('Search', { exact: true });
     this.funnelOptionByName = (name) => page.getByText(name, { exact: false }).first();
 
-    // Captured once (from configureRuleCondition) so every later funnel
-    // reference points at the same funnel the automation rule is scoped to.
     this.selectedFunnelName = null;
 
     // Idea link by title (dynamic)
@@ -166,11 +168,16 @@ export class AutomationPage {
   async toggleRuleStatus(ruleName) {
     await this.searchRule(ruleName);
 
+    const checkedBefore = await this.ruleDisabledSwitch.getAttribute('aria-checked');
     await this.ruleDisabledSwitch.click();
+    await expect(this.ruleDisabledSwitch).not.toHaveAttribute('aria-checked', checkedBefore ?? '', { timeout: 10000 });
+    const checkedAfter = await this.ruleDisabledSwitch.getAttribute('aria-checked');
 
     console.log('✅ Rule status has been toggled successfully...');
 
     await this.ideasButton.click();
+
+    return { checkedBefore, checkedAfter };
   }
 
   //createIdea
@@ -199,6 +206,11 @@ export class AutomationPage {
 
   //updateIdeaTitle
   async updateIdeaTitle(ideaTitle, newIdeaTitle) {
+    // Fail fast and clearly if the caller passed a bad title, rather than
+    // spending two minutes searching for "" or undefined and getting a bare
+    // timeout that doesn't say why.
+    expect(ideaTitle, 'updateIdeaTitle() was called without a valid ideaTitle').toBeTruthy();
+
     await this.ideasButton.click();
 
     await this.page
@@ -211,17 +223,55 @@ export class AutomationPage {
       await this.funnelSwitcherCombobox.click();
       await this.funnelSearchTextbox.fill(this.selectedFunnelName);
       await this.funnelOptionByName(this.selectedFunnelName).click();
-    }
-    await this.page.waitForTimeout(6000);
-    await this.searchIdeasTextbox.fill(ideaTitle);
 
-    // The search index lags behind idea creation, and the lag varies a lot by
-    // domain/environment (a few seconds on some, well over a minute on slower
-    // QA infra). networkidle doesn't help since there's no ongoing network
-    // activity to wait on, so give the link a single generous wait instead of
-    // re-filling the search box (which would just reset any server-side debounce).
+      // Same loading-indicator condition as the wait above, applied to the
+      // funnel switch's own list reload — not a guessed delay.
+      await this.page
+        .waitForFunction(() => !document.querySelector('.animate-pulse'), { timeout: 15000 })
+        .catch(() => {});
+    }
+
+    // Assert we're actually on the intended funnel, and that it reports at
+    // least one idea, BEFORE the slow search-index wait below. The funnel
+    // switcher's label is "FunnelName (N)" — N reflects the idea count
+    // directly from the funnel view, independent of the search index, so
+    // this catches "the idea never actually saved" or "we're on the wrong
+    // funnel" immediately instead of after a 2-minute timeout that looks
+    // identical for either cause.
+    const funnelLabelAfterSwitch = await this.funnelSwitcherCombobox.innerText();
+    expect(
+      funnelLabelAfterSwitch,
+      `Expected to be viewing funnel "${this.selectedFunnelName}" before searching for the idea, but the funnel switcher shows "${funnelLabelAfterSwitch}"`
+    ).toContain(this.selectedFunnelName);
+
+    const ideaCountMatch = funnelLabelAfterSwitch.match(/\((\d+)\)\s*$/);
+    const ideaCount = ideaCountMatch ? Number(ideaCountMatch[1]) : 0;
+    expect(
+      ideaCount,
+      `Funnel "${this.selectedFunnelName}" reports 0 ideas — "${ideaTitle}" likely failed to save, so searching for it would just time out uninformatively`
+    ).toBeGreaterThan(0);
+
+    // Wait for the idea to actually appear in the (unfiltered) list before
+    // doing anything else — confirmed live that a freshly created idea in a
+    // near-empty dedicated funnel renders here in ~10-15s, well before the
+    // search index catches up. Searching immediately means we're racing the
+    // slower of the two paths for no reason.
     const ideaLink = this.ideaLinkByTitle(ideaTitle);
-    await ideaLink.waitFor({ state: 'visible', timeout: 120000 });
+    const appearedUnfiltered = await ideaLink
+      .waitFor({ state: 'visible', timeout: 60000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!appearedUnfiltered) {
+      // Fallback only: if the funnel has enough ideas that this one isn't
+      // rendered without filtering (pagination), search for it. The search
+      // index lags behind idea creation and the lag varies a lot by
+      // domain/environment (a few seconds on some, well over a minute on
+      // slower QA infra), so this generous wait is a last resort, not the
+      // default path.
+      await this.searchIdeasTextbox.fill(ideaTitle);
+      await ideaLink.waitFor({ state: 'visible', timeout: 120000 });
+    }
 
     await ideaLink.click();
 

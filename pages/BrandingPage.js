@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 export class BrandingPage {
   constructor(page) {
     this.page = page;
@@ -84,6 +86,8 @@ export class BrandingPage {
     await this.uploadImage(this.squareLogoEditButton, squareLogoPath);
     await this.setBrandColor(color);
     await this.saveBranding();
+
+    return { color };
   }
 
   //resetBrandingCompany
@@ -99,7 +103,9 @@ export class BrandingPage {
     await this.setBrandColor('#123456');
 
     await this.resetButton.click();
-    await this.page.waitForTimeout(500);
+    // Condition-based: wait for the button to actually show the reverted
+    // value instead of guessing how long the reset re-render takes.
+    await expect(this.colorButton).toHaveText(colorBeforeEdit, { timeout: 10000 });
 
     const colorAfterReset = await this.colorButton.textContent();
 
