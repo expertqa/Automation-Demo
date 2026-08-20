@@ -51,15 +51,7 @@ test('TC-04 — Automation Rules', async ({ page }) => {
     const newIdeaTitle = ideaTitle + '-updated';
     await automationPage.updateIdeaTitle(ideaTitle, newIdeaTitle);
 
-    // Non-blocking on purpose: confirmed live, 3 runs in a row, that a
-    // renamed idea's *new* title can still be unsearchable after 120s even
-    // though updateIdeaTitle() above already succeeded (finding + renaming
-    // it under its *old* title, which is proven reliable). That's a real
-    // asymmetry worth surfacing — idea creation reliably becomes searchable
-    // within ~15s-2min, but this suggests renames may reindex much slower or
-    // less reliably — but forcing a hard failure on it every run would just
-    // make this test permanently flaky over something outside our control.
-    // Report it; don't fail the suite on it.
+
     await automationPage.searchIdeasTextbox.fill(newIdeaTitle);
     const renamedIdeaIndexed = await automationPage.ideaLinkByTitle(newIdeaTitle)
       .isVisible({ timeout: 60000 })
@@ -68,4 +60,9 @@ test('TC-04 — Automation Rules', async ({ page }) => {
       console.log(`⚠️ "${newIdeaTitle}" was not searchable within 60s of the rename — see comment above; not failing the test on this.`);
     }
   });
+});
+
+test('Create funnel', async ({ page }, testInfo) => {
+  console.log(`🔄 Retry number: ${testInfo.retry}`);
+  // ...
 });

@@ -43,3 +43,8 @@ test('TC-01 — Login', async({page}) => {
     });
 
 })
+
+test('Create funnel', async ({ page }, testInfo) => {
+  console.log(`🔄 Retry number: ${testInfo.retry}`);
+  // ...
+});
