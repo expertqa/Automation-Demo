@@ -1,3 +1,4 @@
+import { expect } from '@playwright/test';
 import {generateRandomName} from '../utils/helper.js';
 import { IdeaPage } from './IdeaPage';
 
@@ -26,9 +27,12 @@ export class FunnelPage {
     name: 'View Ideas'
   });
 
-  this.saveFunnelButton = page.getByRole('button', {
-    name: 'Save'
-  });
+  // The app now autosaves this page (confirmed live: no "Save" button
+  // exists at all anymore) — clicking "Create idea funnel" immediately
+  // creates a draft funnel and lands on its full settings page, and typing
+  // the title triggers autosave via this status control, which cycles
+  // "Saving..." -> "Saved" -> disappears within a few seconds.
+  this.savingStatus = page.locator('button').filter({ hasText: /Saving|Saved/i }).last();
   }
 
 
@@ -43,15 +47,15 @@ async createFunnel() {
   await this.funnelTitleInput.waitFor({ state: 'visible', timeout: 30000 });
   await this.funnelTitleInput.fill(funnelName, { timeout: 30000 });
 
-  // "View Ideas" alone navigates into the funnel without properly committing
-  // it server-side (the funnel then never becomes searchable elsewhere, e.g.
-  // as an automation rule's trigger scope) — Save must be clicked explicitly first.
-  await this.saveFunnelButton.click();
+  // No manual Save step — this page autosaves. "View Ideas" navigating
+  // before the title's autosave actually commits server-side is the same
+  // failure mode the old manual-Save flow was guarding against (the funnel
+  // then never becomes searchable elsewhere, e.g. as an automation rule's
+  // trigger scope), so wait for the autosave status to leave "Saving..."
+  // before moving on. Best-effort: the whole cycle can finish in a couple
+  // of seconds, so it's fine if this never catches "Saving..." at all.
+  await expect(this.savingStatus).not.toHaveText('Saving...', { timeout: 15000 }).catch(() => {});
 
-  // No hard wait here: Save gives no visible signal (button state and text
-  // are unchanged whether or not it has actually landed server-side), so the
-  // only real condition available is the outcome we actually care about —
-  // landing on the funnel's kanban URL, waited on below.
   await Promise.all([
     this.page.waitForURL(/\/studio\/funnels\/\d+\?view=kanban/, { timeout: 30000 }),
     this.viewIdeasLink.click({ timeout: 30000 }),
