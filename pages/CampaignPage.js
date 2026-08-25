@@ -277,7 +277,7 @@ export class CampaignPage {
     await this.fileInput.setInputFiles(filePath);
     await this.page
       .getByText("No files or links yet.")
-      .waitFor({ state: "hidden", timeout: 20000 })
+      .waitFor({ state: "hidden", timeout: 2000 })
       .catch(() => {});
 
     console.log("✅ File has been uploaded successfully...");
