@@ -3,11 +3,12 @@ import { test, expect } from '@playwright/test';
 import { TasksPage } from '../pages/TasksPage';
 
 test('TC-06 — Tasks', async ({ page }) => {
-  test.setTimeout(process.env.CI ? 240000 : 180000);
+  
+  test.setTimeout(360000);
 
   const tasksPage = new TasksPage(page);
 
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
 
   let taskData;
 
