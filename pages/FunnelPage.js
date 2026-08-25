@@ -33,7 +33,7 @@ export class FunnelPage {
       .filter({ hasText: /Saving|Saved/i })
       .last();
   }
-
+  //Updated CreateFunnel
   async createFunnel() {
   const funnelName = generateRandomName('Funnel');
 
