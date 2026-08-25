@@ -75,7 +75,7 @@ test("TC-04 — Automation Rules", async ({ page }) => {
       .catch(() => false);
     if (!renamedIdeaIndexed) {
       console.log(
-        `⚠️ "${newIdeaTitle}" was not searchable within 60s of the rename — see comment above; not failing the test on this.`,
+        `❌ "${newIdeaTitle}" was not searchable within 60s of the rename — see comment above; not failing the test on this.`,
       );
     }
   });

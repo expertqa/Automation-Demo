@@ -600,7 +600,7 @@ export class IdeaPage {
       console.log("✅ Link has been added successfully...");
     } else {
       console.log(
-        "⚠️ Links widget not found in the current UI — skipping (needs product/client confirmation on whether this feature still exists).",
+        "❌ Links widget not found in the current UI — skipping (needs product/client confirmation on whether this feature still exists).",
       );
     }
 
