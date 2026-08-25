@@ -28,11 +28,6 @@ export class FunnelPage {
       name: "View Ideas",
     });
 
-    // The app now autosaves this page (confirmed live: no "Save" button
-    // exists at all anymore) — clicking "Create idea funnel" immediately
-    // creates a draft funnel and lands on its full settings page, and typing
-    // the title triggers autosave via this status control, which cycles
-    // "Saving..." -> "Saved" -> disappears within a few seconds.
     this.savingStatus = page
       .locator("button")
       .filter({ hasText: /Saving|Saved/i })
@@ -40,64 +35,61 @@ export class FunnelPage {
   }
 
   async createFunnel() {
-    const funnelName = generateRandomName("Funnel");
-    const duplicateToast = this.page.getByText(/already exists/i);
+  const funnelName = generateRandomName('Funnel');
 
-    await this.toolsButton.waitFor({ state: "visible" });
-    await this.toolsButton.click();
-    await this.funnelsLink.click();
-    await this.createIdeaFunnelLink.waitFor({ state: "visible" });
+  await this.toolsButton.click();
+  await this.funnelsLink.click();
+  await expect(this.createIdeaFunnelLink, '"Create idea funnel" link should be visible').toBeVisible({ timeout: 30000 });
 
-    let created = false;
-    for (let attempt = 1; attempt <= 3 && !created; attempt++) {
-      await this.createIdeaFunnelLink.click();
 
-      const outcome = await Promise.race([
-        duplicateToast
-          .waitFor({ state: "visible" })
-          .then(() => "duplicate")
-          .catch(() => null),
-        this.funnelTitleInput
-          .waitFor({ state: "visible" })
-          .then(() => "created")
-          .catch(() => null),
-      ]);
+  const unauthorizedHeading = this.page.getByRole('heading', { name: 'You are Unauthorized' });
+  let funnelFormOpened = false;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    await this.createIdeaFunnelLink.click();
 
-      if (outcome === "created") {
-        created = true;
-      } else if (outcome === "duplicate") {
-        console.log(
-          `⚠️ Draft funnel default title collided (attempt ${attempt}/3) — retrying...`,
-        );
-        await this.funnelsLink.click();
-        await this.createIdeaFunnelLink.waitFor({ state: "visible" });
-      } else {
-        throw new Error(
-          `Funnel draft creation: neither the duplicate toast nor the title input appeared within 30s (attempt ${attempt}/3).`,
-        );
-      }
+    const outcome = await Promise.race([
+      this.funnelTitleInput.waitFor({ state: 'visible', timeout: 30000 }).then(() => 'form'),
+      unauthorizedHeading.waitFor({ state: 'visible', timeout: 30000 }).then(() => 'unauthorized'),
+    ]);
+
+    if (outcome === 'form') {
+      funnelFormOpened = true;
+      break;
     }
 
-    if (!created) {
-      throw new Error(
-        "Failed to create a funnel draft after 3 attempts — repeated default-title collisions.",
-      );
+    const duplicateTitle = await this.page.getByText(/funnel with title .* already exists/i).isVisible().catch(() => false);
+    if (!duplicateTitle || attempt === 2) {
+      throw new Error('Funnel creation was denied before its title form opened.');
     }
 
-    await this.funnelTitleInput.fill(funnelName);
-
-    await expect(this.savingStatus)
-      .not.toHaveText("Saving...", { timeout: SAFE_ACTION_TIMEOUT_MS })
-      .catch(() => {});
-
-    await this.page.safeWaitForURL(
-      /\/studio\/funnels\/\d+\?view=kanban/,
-      () => this.viewIdeasLink.click({ timeout: SAFE_ACTION_TIMEOUT_MS }),
-      { timeout: SAFE_ACTION_TIMEOUT_MS },
-    );
-
-    console.log("✅ Funnel has been created successfully...");
-
-    return { funnelName, funnelUrl: this.page.url() };
+    await this.page.goBack({ waitUntil: 'domcontentloaded' });
+    await expect(this.createIdeaFunnelLink, 'Create idea funnel link should reappear after a duplicate-title rejection').toBeVisible({ timeout: 30000 });
+    await this.page.waitForTimeout(61000);
   }
+
+  if (!funnelFormOpened) {
+    throw new Error('Funnel title form did not open.');
+  }
+
+  await this.funnelTitleInput.fill(funnelName, { timeout: 30000 });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await this.page.waitForTimeout(700);
+    const currentValue = await this.funnelTitleInput.inputValue();
+    if (currentValue === funnelName) break;
+    await this.funnelTitleInput.fill(funnelName, { timeout: 30000 });
+  }
+  await expect(this.funnelTitleInput, 'Funnel title textbox should hold the name we just typed').toHaveValue(funnelName);
+
+  await expect(this.savingStatus).not.toHaveText('Saving...', { timeout: 15000 }).catch(() => {});
+
+
+  await Promise.all([
+    this.page.waitForURL(/\/studio\/funnels\/\d+\?view=kanban/, { timeout: 30000, waitUntil: 'commit' }),
+    this.viewIdeasLink.click({ timeout: 30000 }),
+  ]);
+
+  console.log('✅ Funnel has been created successfully...');
+
+  return { funnelName, funnelUrl: this.page.url() };
 }
+  }

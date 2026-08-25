@@ -193,7 +193,11 @@ export class IdeaPage {
     this.addLessonRecommen = page.getByRole("textbox", {
       name: "What should others do",
     });
-    this.updateLessonBtn = page.getByRole("button", { name: "Update lesson" });
+    // The lesson dialog's submit button is labeled "Add lesson" for new
+    // lessons (confirmed via page snapshot) — there is no separate "Update
+    // lesson" label in the create flow. .last() avoids matching the dialog's
+    // own "Add lesson" trigger/heading text if it were ever included.
+    this.updateLessonBtn = page.getByRole('button', { name: 'Update lesson' });
 
     // this.hideLessonDialog = page.getByRole('dialog').filter({ hasText: 'Add lesson' });
 
@@ -521,16 +525,14 @@ export class IdeaPage {
     await this.addLessonNotWorked.fill(lessonNotWorked);
     await this.addLessonRecommen.fill(lessonRecommend);
 
-    await this.updateLessonBtn.waitFor({ state: "visible" });
+    await expect(this.updateLessonBtn, 'Update lesson button should be visible').toBeVisible({ timeout: 30000 });
     await this.updateLessonBtn.click();
     await this.page.waitForFunction(() => {
-      const dialog = [...document.querySelectorAll('[role="dialog"]')].find(
-        (d) => d.textContent.includes("Capture learnings"),
-      );
-      return !dialog || dialog.style.pointerEvents !== "auto";
-    });
+    const dialog = [...document.querySelectorAll('[role="dialog"]')].find(d => d.textContent.includes('Capture learnings'));
+    return !dialog || dialog.style.pointerEvents !== 'auto';
+  });
 
-    console.log("✅ Lesson has been added successfully...");
+  console.log('✅ Lesson has been added successfully...');
   }
 
   //addComment

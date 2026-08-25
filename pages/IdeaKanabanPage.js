@@ -42,8 +42,8 @@ export class KanbanPage {
     const sourceCard = this.ideaCardByTitle(itemTitle);
     const targetLane = this.laneByName(targetLaneName);
 
-    await sourceCard.waitFor({ state: "visible" });
-    await targetLane.waitFor({ state: "visible" });
+    await expect(sourceCard, `Idea card "${itemTitle}" should be visible before dragging`).toBeVisible();
+            await expect(targetLane, `Target lane "${targetLaneName}" should be visible before dragging`).toBeVisible();
     await targetLane.scrollIntoViewIfNeeded();
 
     const { x: sourceX, y: sourceY } = this.getCenterCoords(
