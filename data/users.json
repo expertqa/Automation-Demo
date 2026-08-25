@@ -1,0 +1,22 @@
+{
+   
+    "user": {
+        "email": "acceptqatest+automationtest80@mailinator.com",
+        "password": "Testing123!"
+    },
+
+    "Staguser": {
+        "email": "apu-test@yopmail.com",
+        "password": "Test@12345"
+    },
+
+    "invalidUser": {
+        "email": "wrong@test.com",
+        "password": "WrongPassword"
+    },
+
+    "emptyUser": {
+        "email": "",
+        "password": ""
+    }
+}

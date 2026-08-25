@@ -1,0 +1,50 @@
+# Runs the Playwright test suite automatically after the application's deploy
+# pipeline finishes (not on every push/PR), since the tests target a deployed
+# environment rather than the PR's own code.
+trigger: none
+pr: none
+
+resources:
+  pipelines:
+    # TODO: replace `source` with the exact name of your deploy pipeline in
+    # Azure DevOps (Pipelines list). This is what makes this pipeline run
+    # automatically right after a deployment completes.
+    - pipeline: deployPipeline
+      source: 'REPLACE_WITH_DEPLOY_PIPELINE_NAME'
+      trigger:
+        branches:
+          include:
+            - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '18.x'
+    displayName: 'Install Node.js'
+
+  - script: npm ci
+    displayName: 'Install dependencies'
+
+  - script: npx playwright install --with-deps chromium
+    displayName: 'Install Playwright browsers'
+
+  - script: npx playwright test
+    displayName: 'Run Playwright tests'
+
+  - task: PublishTestResults@2
+    condition: always()
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'test-results/junit.xml'
+      failTaskOnFailedTests: false
+    displayName: 'Publish test results'
+
+  - task: PublishPipelineArtifact@1
+    condition: always()
+    inputs:
+      targetPath: 'playwright-report'
+      artifact: 'playwright-report'
+    displayName: 'Publish HTML report'
