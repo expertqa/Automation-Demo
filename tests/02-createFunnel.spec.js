@@ -95,9 +95,6 @@ test("TC-02 — Funnel, Idea & Kanban", async ({ page }) => {
   await test.step("TC-02.15 Move idea through Kanban stages", async () => {
     await kanbanPage.moveIdeaToStage1(ideaTitle, "2. Review idea");
 
-    // moveIdeaToStage1() already waits for the card inside each intermediate
-    // lane as it goes, but this confirms the idea ended up in the correct
-    // *final* lane ("Denied proposal") rather than just having moved somewhere.
     const finalLane = kanbanPage.laneByName("Denied proposal");
     await expect(
       finalLane.getByText(ideaTitle, { exact: false }),
