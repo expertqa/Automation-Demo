@@ -43,7 +43,13 @@ export default defineConfig({
 
     // baseURL: "https://app.acceptmission.dev/",
     baseURL: "https://automationqa-7082.acceptmission.com/",
-    headless: !!process.env.CI,
+    /* Headless on CI by default. Locally, override with HEADED=true or HEADLESS=false
+       to watch the browser, or HEADLESS=true to run headless without a real display. */
+    headless: process.env.HEADLESS
+      ? process.env.HEADLESS === "true"
+      : process.env.HEADED === "true"
+        ? false
+        : !!process.env.CI,
     channel: "",
     locale: 'en-US',
     /* Pinned so date-dependent flows (date pickers, "Today" selection, due

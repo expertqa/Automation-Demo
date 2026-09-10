@@ -7,6 +7,7 @@
     "test": "playwright test",
     "test:list": "playwright test --list",
     "test:headed": "playwright test --headed",
+    "test:headless": "HEADLESS=true playwright test",
     "dashboard": "node tools/qa-dashboard/bin/qa-dashboard.js",
     "dashboard:import": "node tools/qa-dashboard/bin/qa-dashboard.js import",
     "dashboard:seed": "node tools/qa-dashboard/bin/qa-dashboard.js seed",
