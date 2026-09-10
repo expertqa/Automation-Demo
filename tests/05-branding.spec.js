@@ -33,8 +33,3 @@ test("TC-05.2 Reset discards unsaved branding changes", async ({ page }) => {
     expect(colorAfterReset).toBe(colorBeforeEdit);
   });
 });
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
-});

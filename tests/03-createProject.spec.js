@@ -2,8 +2,8 @@ import {
   test,
   expect,
   RATE_LIMIT_TIME_BUDGET_MS,
+  SAFE_ACTION_TIMEOUT_MS,
 } from "../fixtures/rateLimitFixture";
-import { SAFE_ACTION_TIMEOUT_MS } from "../fixtures/rateLimitFixture";
 
 import { ProjectPage } from "../pages/ProjectPage";
 
@@ -90,9 +90,4 @@ test("TC-03 — Project", async ({ page }) => {
       ).toBeVisible({ timeout: SAFE_ACTION_TIMEOUT_MS });
     }
   });
-});
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
 });

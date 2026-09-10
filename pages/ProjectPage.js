@@ -27,6 +27,13 @@ export class ProjectPage {
     // alongside the original menu-trigger that opens the creation dialog
     // (#add-project-menu-button), making the name alone ambiguous.
     this.addProjectButton = page.locator("#add-project-menu-button");
+    this.projectCreationModeDialog = page.getByRole("dialog").filter({
+      has: page.getByRole("button", { name: "Manual", exact: true }),
+    });
+    this.manualProjectButton = this.projectCreationModeDialog.getByRole(
+      "button",
+      { name: "Manual", exact: true },
+    );
 
     // Project title / description
     this.projectTitleInput = page.getByRole("textbox", { name: "Title" });
@@ -92,8 +99,17 @@ export class ProjectPage {
     // Canvas
     this.canvasButton = page.getByRole("button", { name: "Canvases" });
     this.publishButton = page.getByRole("button", { name: "Publish" });
-    this.filenameTextbox = page.getByRole("textbox", { name: "Filename" });
-    this.msgBox = page.getByRole("textbox", { name: "Status message" });
+    this.publishCanvasDialog = page.getByRole("dialog", {
+      name: "Publish canvas update",
+    });
+    this.filenameTextbox = this.publishCanvasDialog.locator("input").first();
+    this.msgBox = this.publishCanvasDialog.getByPlaceholder(
+      "Write the status update to post with this canvas.",
+    );
+    this.publishCanvasSubmitButton = this.publishCanvasDialog.getByRole(
+      "button",
+      { name: "Publish", exact: true },
+    );
 
     // Problems
     this.problemsButton = page.getByRole("button", { name: "Problems" });
@@ -256,8 +272,9 @@ export class ProjectPage {
     await this.projectDropdown.click();
     await this.selectProjectFunnel.click();
     await this.addProjectButton.click();
+    await this.manualProjectButton.click();
 
-    await this.projectTitleInput.click();
+    await this.projectTitleInput.waitFor({ state: "visible" });
     await this.projectTitleInput.fill(projectTitle);
 
     await fillRichText(
@@ -375,12 +392,12 @@ export class ProjectPage {
     await this.publishButton.waitFor({ state: "visible" });
     await this.publishButton.click();
 
-    await this.filenameTextbox.waitFor({ state: "visible" });
+    await this.publishCanvasDialog.waitFor({ state: "visible" });
     await this.filenameTextbox.fill(canvasFilename);
     await this.msgBox.fill(canvasMessage);
 
-    await this.publishButton.click();
-    await this.filenameTextbox.waitFor({ state: "hidden" });
+    await this.publishCanvasSubmitButton.click();
+    await this.publishCanvasDialog.waitFor({ state: "hidden" });
 
     console.log("✅ Canvas has been published successfully...");
   }

@@ -1,4 +1,4 @@
-const { chromium } = require('@playwright/test');
+import { chromium } from '@playwright/test';
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({

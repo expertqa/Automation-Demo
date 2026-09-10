@@ -1,4 +1,8 @@
-import { test, expect, RATE_LIMIT_TIME_BUDGET_MS } from "../fixtures/rateLimitFixture";
+import {
+  test,
+  expect,
+  RATE_LIMIT_TIME_BUDGET_MS,
+} from "../fixtures/rateLimitFixture";
 
 import { AutomationPage } from "../pages/AutomationPage";
 
@@ -44,13 +48,16 @@ test("TC-04 — Automation Rules", async ({ page }) => {
   });
 
   await test.step("TC-04.4 Search and toggle rule status", async () => {
-    const { checkedBefore, checkedAfter } =
+    const { checkedBefore, checkedAfter, finalState } =
       await automationPage.toggleRuleStatus(ruleName);
 
     expect(
       checkedAfter,
       "Rule enabled/disabled switch should flip state",
     ).not.toBe(checkedBefore);
+    expect(finalState, "Rule must be enabled before trigger verification").toBe(
+      "true",
+    );
   });
 
   let ideaTitle;
@@ -68,20 +75,6 @@ test("TC-04 — Automation Rules", async ({ page }) => {
     const newIdeaTitle = ideaTitle + "-updated";
     await automationPage.updateIdeaTitle(ideaTitle, newIdeaTitle);
 
-    await automationPage.searchIdeasTextbox.fill(newIdeaTitle);
-    const renamedIdeaIndexed = await automationPage
-      .ideaLinkByTitle(newIdeaTitle)
-      .isVisible({ timeout: 60000 })
-      .catch(() => false);
-    if (!renamedIdeaIndexed) {
-      console.log(
-        `❌ "${newIdeaTitle}" was not searchable within 60s of the rename — see comment above; not failing the test on this.`,
-      );
-    }
+    await automationPage.verifyRuleTriggered(newIdeaTitle);
   });
-});
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
 });

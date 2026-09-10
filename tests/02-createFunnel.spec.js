@@ -102,8 +102,3 @@ test("TC-02 — Funnel, Idea & Kanban", async ({ page }) => {
     ).toBeVisible();
   });
 });
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
-});

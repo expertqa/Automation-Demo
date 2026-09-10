@@ -1,5 +1,5 @@
 import { generateRandomName, fillRichText } from "../utils/helper.js";
-const { expect } = require("@playwright/test");
+import { expect } from "@playwright/test";
 import { SAFE_ACTION_TIMEOUT_MS } from "../fixtures/rateLimitFixture";
 
 export class IdeaPage {
@@ -49,8 +49,19 @@ export class IdeaPage {
     // Canvas
     this.canvasButton = page.locator("button").filter({ hasText: /^Canvases/ });
     this.publishButton = page.getByRole("button", { name: "Publish" });
-    this.filenameTextbox = page.getByRole("textbox", { name: "Filename" });
-    this.msgBox = page.getByRole("textbox", { name: "Status message" });
+    this.publishCanvasDialog = page.getByRole("dialog", {
+      name: "Publish canvas update",
+    });
+    // The app's visible "Filename" text is not associated with its input, so
+    // the input's accessible name is its generated value rather than the label.
+    this.filenameTextbox = this.publishCanvasDialog.locator("input").first();
+    this.msgBox = this.publishCanvasDialog.getByPlaceholder(
+      "Write the status update to post with this canvas.",
+    );
+    this.publishCanvasSubmitButton = this.publishCanvasDialog.getByRole(
+      "button",
+      { name: "Publish", exact: true },
+    );
 
     // Problems
     this.problemsButton = page.getByRole("button", { name: "Problems" });
@@ -362,12 +373,12 @@ export class IdeaPage {
     await this.publishButton.waitFor({ state: "visible" });
     await this.publishButton.click();
 
-    await this.filenameTextbox.waitFor({ state: "visible" });
+    await this.publishCanvasDialog.waitFor({ state: "visible" });
     await this.filenameTextbox.fill(canvasFilename);
     await this.msgBox.fill(canvasMessage);
 
-    await this.publishButton.click();
-    await this.filenameTextbox.waitFor({ state: "hidden" });
+    await this.publishCanvasSubmitButton.click();
+    await this.publishCanvasDialog.waitFor({ state: "hidden" });
 
     console.log("✅ Canvas has been published successfully...");
   }
@@ -600,7 +611,7 @@ export class IdeaPage {
       console.log("✅ Link has been added successfully...");
     } else {
       console.log(
-        "❌ Links widget not found in the current UI — skipping (needs product/client confirmation on whether this feature still exists).",
+        "⚠️ Links widget not found in the current UI — skipping (needs product/client confirmation on whether this feature still exists).",
       );
     }
 

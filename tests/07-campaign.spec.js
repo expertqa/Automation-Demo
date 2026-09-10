@@ -73,8 +73,3 @@ test("TC-07 — Campaign", async ({ page }) => {
     expect(campaignTitle).toBeTruthy();
   });
 });
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
-});

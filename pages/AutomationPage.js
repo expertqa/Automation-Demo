@@ -79,8 +79,15 @@ export class AutomationPage {
     this.funnelSearchTextbox = page.getByPlaceholder("Search", { exact: true });
     this.funnelOptionByName = (name) =>
       page.getByText(name, { exact: false }).first();
+    this.ideaLaneByName = (laneName) =>
+      page
+        .locator("div")
+        .filter({ hasText: new RegExp(`^${laneName}`) })
+        .and(page.locator(".bg-gray-100"))
+        .first();
 
     this.selectedFunnelName = null;
+    this.selectedTargetLaneName = null;
 
     // Idea link by title (dynamic)
     this.ideaLinkByTitle = (ideaTitle) =>
@@ -220,7 +227,10 @@ export class AutomationPage {
       .getByRole("combobox")
       .filter({ hasText: "Select lane" })
       .click();
-    await this.suggestionsSecondOption.click();
+    const targetLaneOption = this.suggestionsSecondOption;
+    await targetLaneOption.waitFor({ state: "visible" });
+    this.selectedTargetLaneName = (await targetLaneOption.innerText()).trim();
+    await targetLaneOption.click();
 
     console.log("✅ Rule condition has been configured successfully...");
   }
@@ -255,11 +265,24 @@ export class AutomationPage {
     const checkedAfter =
       await this.ruleDisabledSwitch.getAttribute("aria-checked");
 
+    // The next steps verify that this rule executes. If the requested toggle
+    // turned it off, restore it to enabled after proving the switch changed.
+    if (checkedAfter !== "true") {
+      await this.ruleDisabledSwitch.click();
+      await expect(this.ruleDisabledSwitch).toHaveAttribute(
+        "aria-checked",
+        "true",
+        { timeout: SAFE_ACTION_TIMEOUT_MS },
+      );
+    }
+    const finalState =
+      await this.ruleDisabledSwitch.getAttribute("aria-checked");
+
     console.log("✅ Rule status has been toggled successfully...");
 
     await this.ideasButton.click();
 
-    return { checkedBefore, checkedAfter };
+    return { checkedBefore, checkedAfter, finalState };
   }
 
   //createIdea
@@ -384,11 +407,29 @@ export class AutomationPage {
     await this.ideaTitleButton.click();
     await this.ideaTitleTextbox.click();
     await this.ideaTitleTextbox.fill(newIdeaTitle);
+    await expect(this.ideaTitleTextbox).toHaveValue(newIdeaTitle);
 
     await this.closeButton.click();
 
     console.log("✅ Idea title has been updated successfully...");
 
     await this.ideasButton.click();
+  }
+
+  async verifyRuleTriggered(ideaTitle) {
+    expect(
+      this.selectedTargetLaneName,
+      "No target lane was captured while configuring the automation rule",
+    ).toBeTruthy();
+
+    // Validate the Kanban result directly. The full-text search index is
+    // eventually consistent and can lag a successful update by several
+    // minutes, so it is not a reliable oracle for this rule assertion.
+    await this.searchIdeasTextbox.fill("");
+    const targetLane = this.ideaLaneByName(this.selectedTargetLaneName);
+    await expect(
+      targetLane.getByRole("link", { name: ideaTitle, exact: true }),
+      `Updated idea "${ideaTitle}" should move to lane "${this.selectedTargetLaneName}"`,
+    ).toBeVisible({ timeout: SAFE_ACTION_TIMEOUT_MS });
   }
 }

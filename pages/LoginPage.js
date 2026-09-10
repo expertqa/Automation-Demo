@@ -15,7 +15,7 @@ export class LoginPage {
     await this.page.fill(this.passwordInput, password);
     await this.logInButton.click();
 
-    console.log("❌ Login test passed - User cannot login with Empty fields");
+    console.log("✅ Empty credentials were correctly rejected");
   }
 
   async loginInvalidData(email, password) {
@@ -23,7 +23,7 @@ export class LoginPage {
     await this.page.fill(this.passwordInput, password);
     await this.logInButton.click();
 
-    console.log("❌ Login test passed - User cannot login with Invalid Data");
+    console.log("✅ Invalid credentials were correctly rejected");
   }
 
   async login(email, password) {

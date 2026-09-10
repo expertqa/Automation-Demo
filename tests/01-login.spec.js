@@ -58,8 +58,3 @@ test("TC-01 — Login", async ({ page }) => {
     ).not.toHaveURL(/\/login/);
   });
 });
-
-test("Create funnel", async ({ page }, testInfo) => {
-  console.log(`🔄 Retry number: ${testInfo.retry}`);
-  // ...
-});

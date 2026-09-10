@@ -22,7 +22,7 @@ pool:
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '18.x'
+      versionSpec: '22.x'
     displayName: 'Install Node.js'
 
   - script: npm ci
@@ -31,7 +31,7 @@ steps:
   - script: npx playwright install --with-deps chromium
     displayName: 'Install Playwright browsers'
 
-  - script: npx playwright test
+  - script: npm test
     displayName: 'Run Playwright tests'
 
   - task: PublishTestResults@2

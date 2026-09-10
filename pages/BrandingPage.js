@@ -48,7 +48,7 @@ export class BrandingPage {
     // whatever the app does on initial bootstrap (session check, bundle
     // load), which is more prone to occasionally exceeding a tight timeout
     // than navigating there from an already-warm app shell would be.
-    if (!this.page.url().includes(new URL(this.page.url()).origin)) {
+    if (this.page.url() === "about:blank") {
       await this.page.goto("/");
     }
     await this.page.goto("/settings/branding");

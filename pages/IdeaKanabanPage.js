@@ -46,12 +46,16 @@ export class KanbanPage {
             await expect(targetLane, `Target lane "${targetLaneName}" should be visible before dragging`).toBeVisible();
     await targetLane.scrollIntoViewIfNeeded();
 
-    const { x: sourceX, y: sourceY } = this.getCenterCoords(
-      await sourceCard.boundingBox(),
-    );
-    const { x: targetX, y: targetY } = this.getCenterCoords(
-      await targetLane.boundingBox(),
-    );
+    const sourceBox = await sourceCard.boundingBox();
+    const targetBox = await targetLane.boundingBox();
+    if (!sourceBox || !targetBox) {
+      throw new Error(
+        `Could not calculate drag coordinates for "${itemTitle}" -> "${targetLaneName}".`,
+      );
+    }
+
+    const { x: sourceX, y: sourceY } = this.getCenterCoords(sourceBox);
+    const { x: targetX, y: targetY } = this.getCenterCoords(targetBox);
 
     await this.page.mouse.move(sourceX, sourceY, { steps: 10 });
     await this.page.mouse.down();

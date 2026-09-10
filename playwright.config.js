@@ -14,6 +14,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  /* Keep quarantined scenarios out of every configured test run. */
+  testIgnore: ['**/unstable/**'],
   /* Authenticate once before the whole suite runs; every test starts already logged in. */
   globalSetup: './global-setup.js',
   /* Run tests in files in parallel */
@@ -22,7 +24,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-    /* Tests share one live, authenticated account/session - run serially everywhere to avoid cross-test UI/state contention. */
+  /* Tests share one live, authenticated account/session - run serially everywhere to avoid cross-test UI/state contention. */
   workers: 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
@@ -35,7 +37,7 @@ export default defineConfig({
     // baseURL: 'http://localhost:3000',
 
     // baseURL: "https://app.acceptmission.dev/",
-  baseURL: "https://automationqa-7082.acceptmission.com/",
+    baseURL: "https://automationqa-7082.acceptmission.com/",
     headless: !!process.env.CI,
     channel: "",
     locale: 'en-US',
@@ -49,6 +51,7 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -93,4 +96,3 @@ export default defineConfig({
   //   reuseExistingServer: !process.env.CI,
   // },
 });
-
