@@ -155,6 +155,7 @@ export function deleteRunsBySource(ctx: AppContext, source: string): number {
 
 export type RawRunRow = {
   id: string;
+  label: string;
   created_at: string;
   started_at: string;
   finished_at: string;
@@ -196,6 +197,7 @@ export type RawRunRow = {
 export function fromRawRun(r: RawRunRow): RunRow {
   return {
     id: r.id,
+    label: r.label,
     createdAt: r.created_at,
     startedAt: r.started_at,
     finishedAt: r.finished_at,

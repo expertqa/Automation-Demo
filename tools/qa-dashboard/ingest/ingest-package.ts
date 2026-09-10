@@ -85,6 +85,7 @@ export async function ingestPackage(pkg: ResultPackage, packageDir: string, opti
       tx.insert(schema.runs)
         .values({
           id: runId,
+          label: pkg.run.label || runId,
           createdAt: now,
           startedAt: pkg.run.startedAt,
           finishedAt: pkg.run.finishedAt,

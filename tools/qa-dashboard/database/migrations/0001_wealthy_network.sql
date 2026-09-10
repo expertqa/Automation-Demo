@@ -1,0 +1,1 @@
+ALTER TABLE `runs` ADD `label` text DEFAULT '' NOT NULL;

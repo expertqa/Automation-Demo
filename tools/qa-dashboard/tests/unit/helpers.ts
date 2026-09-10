@@ -80,6 +80,7 @@ export function makePackage(opts: { runId: string; startedAt?: string; tests: Fa
     generator: { name: 'test', version: '0' },
     run: {
       id: opts.runId,
+      label: opts.runId,
       startedAt,
       finishedAt: new Date(Date.parse(startedAt) + 60_000).toISOString(),
       durationMs: 60_000,

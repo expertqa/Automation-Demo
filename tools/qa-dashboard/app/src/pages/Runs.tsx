@@ -119,7 +119,10 @@ export function RunsTable({ runs, compact = false }: { runs: RunSummary[]; compa
             <TD>
               <div className="flex items-center gap-2">
                 <SourceIcon source={r.source} />
-                <span className="font-mono text-xs">{r.id}</span>
+                <div className="min-w-0">
+                  <div className="truncate text-[13px]">{r.label}</div>
+                  <div className="truncate font-mono text-[11px] text-muted-foreground" title={r.id}>{r.id}</div>
+                </div>
               </div>
             </TD>
             <TD>

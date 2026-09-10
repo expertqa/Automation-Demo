@@ -116,6 +116,25 @@ Trace handling sits behind `server/trace/adapter.ts` so an embedded viewer can r
 
 The reporter needs **no dashboard dependencies on CI** — it only uses Node built-ins — so the test job installs nothing extra. `azure-pipelines.yml` publishes the same package as a pipeline artifact.
 
+## CI triggers
+
+The dashboard can trigger a GitHub Actions run directly from the UI ("Run this suite" on a suite's file, "Run full suite" on Overview, "Trigger CI" on a single test's detail page). This posts to `POST /api/ci/run`, which calls GitHub's `workflow_dispatch` REST API for `.github/workflows/playwright.yml`.
+
+To enable it, set the **`GITHUB_TOKEN`** environment variable on the machine/process running the dashboard server (not the browser) to a GitHub Personal Access Token with:
+
+- **`repo`** scope (or fine-grained: Contents: read, Actions: read & write) on `expertqa/Automation-Demo`
+- **`workflow`** scope (required to dispatch/update GitHub Actions workflows)
+
+Create one at <https://github.com/settings/tokens>, then start the dashboard with it in the environment, e.g.:
+
+```bash
+GITHUB_TOKEN=ghp_xxx npm run dashboard
+```
+
+Without `GITHUB_TOKEN` set, the endpoint returns a `400` with a message pointing back here — the buttons still render but show that error instead of crashing the server.
+
+The `workflow_dispatch` API does not return a run id, so a successful trigger links to the workflow's run list (`https://github.com/expertqa/Automation-Demo/actions/workflows/playwright.yml`) instead of a specific run — the newest entry there is your dispatch, usually within a few seconds.
+
 ## Flaky detection
 
 Configurable in **Settings**. Over the last *N* executions of a test (default 20, at least 3): flagged when any execution passed only after a retry, when the failure rate is strictly between 10 % and 90 %, or when results flipped pass↔fail at least 3 times. Each flag shows its reasons.

@@ -45,13 +45,16 @@ export function RunDetailPage() {
         }
         title={
           <span className="flex flex-wrap items-center gap-2">
-            <span className="font-mono">{run.id}</span>
+            <span>{run.label}</span>
             <StatusBadge status={run.status} upper />
             {run.source === 'demo' && <Badge variant="info">demo</Badge>}
           </span>
         }
         description={
           <span className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span className="font-mono text-xs text-muted-foreground" title="Technical run identifier">
+              Run ID: {run.id}
+            </span>
             <span className="inline-flex items-center gap-1">
               <GitBranch className="h-3.5 w-3.5" /> {run.branch ?? '—'}
             </span>

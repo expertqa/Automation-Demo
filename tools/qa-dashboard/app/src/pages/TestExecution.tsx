@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { Download, ExternalLink, FileCode2, Github, GitCommit, Globe, History, Image as ImageIcon, Play, Terminal, Video, Workflow, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Circle, Download, ExternalLink, FileCode2, Github, GitCommit, Globe, History, Image as ImageIcon, ListChecks, Play, Terminal, Video, Workflow, XCircle, AlertCircle } from 'lucide-react';
 import { PageHeader } from '@/components/PageHeader';
 import { StatusBadge } from '@/components/StatusBadge';
 import { HistoryStrip } from '@/components/HistoryStrip';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { RunCiButton } from '@/components/RunCiButton';
 import { openTrace, useRunTest } from '@/lib/api';
 import { cn, formatBytes, formatDateTime, formatDuration, formatPercent, shortSha } from '@/lib/utils';
 import type { ArtifactSummary, AttemptDetail, RunTestDetail } from '@shared/api';
@@ -83,6 +84,7 @@ export function TestExecutionPage() {
         }
         actions={
           <>
+            <RunCiButton grep={test.title} label={`${test.title} only`} buttonLabel="Trigger CI" />
             <ExternalButton href={links.sourceUrl} icon={<Github className="h-3.5 w-3.5" />} label="View Source on GitHub" primary testId="view-source" />
             <ExternalButton href={links.commitUrl} icon={<GitCommit className="h-3.5 w-3.5" />} label="View Commit" />
             <ExternalButton href={links.ciRunUrl} icon={<Workflow className="h-3.5 w-3.5" />} label="View CI Run" />
@@ -103,6 +105,9 @@ export function TestExecutionPage() {
           <TabsTrigger value="error" data-testid="tab-error">
             Error {errorCount > 0 && <Count n={errorCount} tone="failed" />}
           </TabsTrigger>
+          <TabsTrigger value="steps" data-testid="tab-steps">
+            <ListChecks className="h-3.5 w-3.5" /> Steps {lastAttempt && lastAttempt.steps.length > 0 && <Count n={lastAttempt.steps.length} />}
+          </TabsTrigger>
           <TabsTrigger value="trace">
             <Play className="h-3.5 w-3.5" /> Trace {traces.length > 0 && <Count n={traces.length} />}
           </TabsTrigger>
@@ -122,6 +127,9 @@ export function TestExecutionPage() {
         </TabsContent>
         <TabsContent value="error">
           <ErrorTab attempts={attempts} sourceUrl={links.sourceUrl} />
+        </TabsContent>
+        <TabsContent value="steps">
+          <StepsTab attempts={attempts} />
         </TabsContent>
         <TabsContent value="trace">
           <TraceTab traces={traces} />
@@ -399,6 +407,60 @@ function ErrorTab({ attempts, sourceUrl }: { attempts: AttemptDetail[]; sourceUr
           </CardContent>
         </Card>
       ))}
+    </div>
+  );
+}
+
+/**
+ * Ordered step list for a test attempt — lets a non-technical user see exactly
+ * which named step (e.g. "TC-02.15 Move idea to Create proposal") failed and
+ * how long it took, instead of only a file:line.
+ */
+function StepsTab({ attempts }: { attempts: AttemptDetail[] }) {
+  const withSteps = attempts.filter((a) => a.steps.length > 0);
+  if (withSteps.length === 0) {
+    return (
+      <EmptyState
+        title="No steps recorded"
+        description="This test does not use test.step(...), or no steps were captured for its attempts."
+      />
+    );
+  }
+  return (
+    <div className="space-y-4">
+      {withSteps
+        .slice()
+        .reverse()
+        .map((a) => (
+          <Card key={a.id}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Attempt #{a.retry} <StatusBadge status={a.status} />
+              </CardTitle>
+              <span className="text-xs text-muted-foreground">
+                {a.steps.length} step(s) · {formatDuration(a.durationMs)}
+              </span>
+            </CardHeader>
+            <div className="divide-y divide-border">
+              {a.steps.map((s, i) => (
+                <div key={i} className="flex items-start gap-2 px-4 py-2 text-[13px]" style={{ paddingLeft: 16 + s.depth * 16 }} data-testid="step-row">
+                  {s.error ? (
+                    <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-status-failed" />
+                  ) : s.error === null && s.durationMs === 0 ? (
+                    <Circle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  ) : (
+                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-status-passed" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className={cn(s.error && 'text-status-failed')}>{s.title}</div>
+                    {s.error && <div className="mt-0.5 whitespace-pre-wrap break-words font-mono text-xs text-status-failed/90">{s.error}</div>}
+                  </div>
+                  <span className="ml-auto shrink-0 tabular text-xs text-muted-foreground">{formatDuration(s.durationMs)}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        ))}
     </div>
   );
 }

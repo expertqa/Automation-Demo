@@ -78,4 +78,15 @@ export const openTrace = (artifactId: number) => api<TraceOpenResponse>(`/artifa
 export const saveSettings = (body: unknown) => api<SettingsResponse>('/settings', { method: 'PUT', body: JSON.stringify(body) });
 export const resetSettings = () => api<SettingsResponse>('/settings', { method: 'DELETE' });
 export const deleteRun = (id: string) => api<{ ok: boolean }>(`/runs/${id}`, { method: 'DELETE' });
+
+export interface TriggerCiInput {
+  testFile?: string;
+  grep?: string;
+  label: string;
+}
+export interface TriggerCiResponse {
+  ok: boolean;
+  actionsUrl: string;
+}
+export const triggerCi = (body: TriggerCiInput) => api<TriggerCiResponse>('/ci/run', { method: 'POST', body: JSON.stringify(body) });
 export const deleteDemoData = () => api<{ ok: boolean; removed: number }>('/demo-data', { method: 'DELETE' });

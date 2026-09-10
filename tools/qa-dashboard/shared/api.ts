@@ -13,6 +13,8 @@ export interface Paginated<T> {
 
 export interface RunSummary {
   id: string;
+  /** Human-friendly label, e.g. "Sep 10, 2026 5:52 PM — Full Suite". Falls back to `id` for older runs. */
+  label: string;
   startedAt: string;
   finishedAt: string;
   durationMs: number;

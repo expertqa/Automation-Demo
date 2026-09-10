@@ -25,6 +25,7 @@ export function mapRun(row: RunRow, repoOverride: string | null): RunSummary {
   }
   return {
     id: row.id,
+    label: row.label || row.id,
     startedAt: row.startedAt,
     finishedAt: row.finishedAt,
     durationMs: row.durationMs,

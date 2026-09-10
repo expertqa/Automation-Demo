@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table';
 import { TestsTable } from '@/pages/Tests';
+import { RunCiButton } from '@/components/RunCiButton';
 import { useSuite, useSuites } from '@/lib/api';
 import { useScope } from '@/hooks/useScope';
 import { formatDuration, formatPercent, timeAgo } from '@/lib/utils';
@@ -143,7 +144,10 @@ export function SuiteDetailPage() {
             <CardTitle className="flex items-center gap-2 font-mono text-xs">
               <FileCode2 className="h-3.5 w-3.5" /> {f.file}
             </CardTitle>
-            <span className="text-xs text-muted-foreground">{f.tests.length} tests</span>
+            <span className="flex items-center gap-3 text-xs text-muted-foreground">
+              {f.tests.length} tests
+              <RunCiButton testFile={f.file} label={`${f.file} only`} buttonLabel="Run this suite" />
+            </span>
           </CardHeader>
           <TestsTable tests={f.tests} hideSuite />
         </Card>

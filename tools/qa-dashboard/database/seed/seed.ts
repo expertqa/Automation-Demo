@@ -148,6 +148,7 @@ export async function seedDemoData(options: SeedOptions): Promise<{ runs: number
         generator: { name: 'qa-dashboard-seed', version: '1.0.0' },
         run: {
           id: runId,
+          label: `${startedAt.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })} — Full Suite`,
           startedAt: startedAt.toISOString(),
           finishedAt: finishedAt.toISOString(),
           durationMs: finishedAt.getTime() - startedAt.getTime(),

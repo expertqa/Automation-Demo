@@ -9,6 +9,8 @@ export const runs = sqliteTable(
   'runs',
   {
     id: text('id').primaryKey(),
+    /** Human-friendly label shown as the primary run identifier in the UI, e.g. "Sep 10, 2026 5:52 PM — Full Suite". */
+    label: text('label').notNull().default(''),
     createdAt: text('created_at').notNull(),
     startedAt: text('started_at').notNull(),
     finishedAt: text('finished_at').notNull(),

@@ -100,6 +100,8 @@ export interface PackageTestRecord {
 
 export interface PackageRunRecord {
   id: string;
+  /** Human-friendly label, e.g. "Sep 10, 2026 5:52 PM — Full Suite". */
+  label: string;
   startedAt: string;
   finishedAt: string;
   durationMs: number;

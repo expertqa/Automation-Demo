@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      test_file:
+        description: 'Spec file to run (e.g. tests/02-createFunnel.spec.js). Leave empty to run everything (or use grep instead).'
+        required: false
+        type: string
+      grep:
+        description: 'Title/tag pattern to filter tests (passed to --grep). Leave empty to run everything (or use test_file instead).'
+        required: false
+        type: string
 
 jobs:
   test:
@@ -30,7 +39,17 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run Playwright tests
-        run: npm test
+        env:
+          TEST_FILE: ${{ inputs.test_file }}
+          GREP: ${{ inputs.grep }}
+        run: |
+          if [ -n "$TEST_FILE" ]; then
+            npx playwright test "$TEST_FILE"
+          elif [ -n "$GREP" ]; then
+            npx playwright test --grep "$GREP"
+          else
+            npm test
+          fi
 
       - name: Upload HTML report
         if: always()

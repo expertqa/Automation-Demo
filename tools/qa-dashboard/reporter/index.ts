@@ -150,6 +150,37 @@ export default class QaDashboardReporter implements Reporter {
     return process.env.QA_DASHBOARD_ENV ?? this.options.environment ?? (detectCi().ci ? 'ci' : 'local');
   }
 
+  /**
+   * Human-friendly label for the run, shown as the primary identifier in the
+   * dashboard (the run_... id stays as a secondary/technical identifier).
+   * Detects a filtered run (single spec file, or a --grep pattern) from the
+   * actual test files that ran plus the raw CLI args, since Playwright does
+   * not expose the resolved filter directly on FullConfig.
+   */
+  private computeRunLabel(): string {
+    const when = this.startedAt.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    const files = Array.from(new Set(this.records.map((r) => r.file)));
+    const argv = process.argv.slice(2);
+    const grepIdx = argv.findIndex((a) => a === '--grep' || a === '-g');
+    const grepArg = grepIdx >= 0 ? argv[grepIdx + 1] : argv.find((a) => a.startsWith('--grep='))?.split('=').slice(1).join('=');
+
+    let scope: string;
+    if (grepArg) {
+      scope = `"${grepArg}"`;
+    } else if (files.length === 1) {
+      scope = `${path.basename(files[0]!, path.extname(files[0]!))} only`;
+    } else {
+      scope = 'Full Suite';
+    }
+    return `${when} — ${scope}`;
+  }
+
   private buildPackage(result: FullResult): ResultPackage {
     const finishedAt = new Date();
     const { ci } = detectCi();
@@ -170,6 +201,7 @@ export default class QaDashboardReporter implements Reporter {
       generator: { name: 'qa-dashboard-reporter', version: REPORTER_VERSION },
       run: {
         id: this.runId,
+        label: this.computeRunLabel(),
         startedAt: this.startedAt.toISOString(),
         finishedAt: finishedAt.toISOString(),
         durationMs: result.duration ?? finishedAt.getTime() - this.startedAt.getTime(),

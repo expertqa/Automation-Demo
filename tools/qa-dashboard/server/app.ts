@@ -5,6 +5,7 @@ import fastifyStatic from '@fastify/static';
 import type { AppContext } from './context';
 import { registerApiRoutes } from './routes/api';
 import { registerArtifactRoutes } from './routes/artifacts';
+import { registerCiRoutes } from './routes/ci';
 
 export interface BuildAppOptions {
   ctx: AppContext;
@@ -36,6 +37,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   await app.register(registerApiRoutes, { prefix: '/api' });
   await app.register(registerArtifactRoutes, { prefix: '/api/artifacts' });
+  await app.register(registerCiRoutes, { prefix: '/api/ci' });
 
   const staticDir = options.staticDir;
   if (staticDir && fs.existsSync(path.join(staticDir, 'index.html'))) {

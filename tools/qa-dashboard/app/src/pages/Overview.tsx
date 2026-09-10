@@ -8,6 +8,7 @@ import { DurationTrend, FailureFlakyTrend, PassFailTrend, PassRateTrend } from '
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RunsTable } from '@/pages/Runs';
+import { RunCiButton } from '@/components/RunCiButton';
 import { useOverview } from '@/lib/api';
 import { useScope } from '@/hooks/useScope';
 import { formatDuration, formatPercent, shortSha, timeAgo } from '@/lib/utils';
@@ -47,7 +48,7 @@ export function OverviewPage() {
         description={
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <span>
-              Latest execution <Link to={`/runs/${latest.id}`} className="font-mono text-foreground hover:underline">{latest.id}</Link> · {timeAgo(latest.startedAt)}
+              Latest execution <Link to={`/runs/${latest.id}`} className="text-foreground hover:underline" title={latest.id}>{latest.label}</Link> · {timeAgo(latest.startedAt)}
             </span>
             {d.hasDemoData && (
               <Badge variant="info" title="Demo runs are tagged source=demo and can be removed from Settings">
@@ -57,9 +58,12 @@ export function OverviewPage() {
           </span>
         }
         actions={
-          <Link to={`/runs/${latest.id}`} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
-            Open latest run <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <>
+            <RunCiButton label="Full Suite" buttonLabel="Run full suite" />
+            <Link to={`/runs/${latest.id}`} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
+              Open latest run <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </>
         }
       />
 
