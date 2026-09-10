@@ -147,6 +147,7 @@ export function SuiteDetailPage() {
             <span className="flex items-center gap-3 text-xs text-muted-foreground">
               {f.tests.length} tests
               <RunCiButton testFile={f.file} label={`${f.file} only`} buttonLabel="Run this suite" />
+              <RunCiButton testFile={f.file} label={`${f.file} only`} headed buttonLabel="Run headed" />
             </span>
           </CardHeader>
           <TestsTable tests={f.tests} hideSuite />

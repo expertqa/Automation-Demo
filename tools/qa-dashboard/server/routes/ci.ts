@@ -8,6 +8,7 @@ interface RunCiBody {
   testFile?: string;
   grep?: string;
   label: string;
+  headed?: boolean;
 }
 
 /**
@@ -26,7 +27,7 @@ export const registerCiRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const { testFile, grep, label } = req.body ?? ({} as RunCiBody);
+    const { testFile, grep, label, headed } = req.body ?? ({} as RunCiBody);
     if (!label || typeof label !== 'string') {
       return reply.code(400).send({ error: 'label is required' });
     }
@@ -37,6 +38,7 @@ export const registerCiRoutes: FastifyPluginAsync = async (app) => {
     const inputs: Record<string, string> = {};
     if (testFile) inputs.test_file = testFile;
     if (grep) inputs.grep = grep;
+    if (headed) inputs.headed = 'true';
 
     try {
       const res = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WORKFLOW_FILE}/dispatches`, {
@@ -51,7 +53,7 @@ export const registerCiRoutes: FastifyPluginAsync = async (app) => {
       });
 
       if (res.status === 204) {
-        ctx.logger.info(`triggered CI run: ${label}${testFile ? ` (file: ${testFile})` : ''}${grep ? ` (grep: ${grep})` : ''}`);
+        ctx.logger.info(`triggered CI run: ${label}${testFile ? ` (file: ${testFile})` : ''}${grep ? ` (grep: ${grep})` : ''}${headed ? ' [headed]' : ''}`);
         return {
           ok: true,
           actionsUrl: `https://github.com/${REPO}/actions/workflows/${WORKFLOW_FILE}`,

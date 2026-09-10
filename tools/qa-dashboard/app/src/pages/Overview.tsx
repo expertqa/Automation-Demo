@@ -60,6 +60,7 @@ export function OverviewPage() {
         actions={
           <>
             <RunCiButton label="Full Suite" buttonLabel="Run full suite" />
+            <RunCiButton label="Full Suite" headed buttonLabel="Run full suite (headed)" />
             <Link to={`/runs/${latest.id}`} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
               Open latest run <ArrowRight className="h-3.5 w-3.5" />
             </Link>

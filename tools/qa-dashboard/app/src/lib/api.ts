@@ -83,6 +83,7 @@ export interface TriggerCiInput {
   testFile?: string;
   grep?: string;
   label: string;
+  headed?: boolean;
 }
 export interface TriggerCiResponse {
   ok: boolean;

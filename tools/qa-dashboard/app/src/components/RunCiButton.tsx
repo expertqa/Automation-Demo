@@ -15,7 +15,8 @@ export function RunCiButton({
   testFile,
   grep,
   label,
-  buttonLabel = 'Run',
+  headed = false,
+  buttonLabel = headed ? 'Run headed' : 'Run',
   size = 'sm',
   variant = 'outline',
 }: TriggerCiInput & { buttonLabel?: string; size?: 'sm' | 'default'; variant?: 'outline' | 'default' | 'ghost' }) {
@@ -24,7 +25,7 @@ export function RunCiButton({
   const run = async () => {
     setState({ busy: true });
     try {
-      const res = await triggerCi({ testFile, grep, label });
+      const res = await triggerCi({ testFile, grep, label, headed });
       setState({ busy: false, ok: true, actionsUrl: res.actionsUrl, message: 'Triggered — check GitHub Actions for progress.' });
     } catch (err) {
       const message = err instanceof ApiError ? err.message : (err as Error).message;
@@ -34,7 +35,7 @@ export function RunCiButton({
 
   return (
     <div className="inline-flex flex-col items-start gap-1">
-      <Button size={size} variant={variant} onClick={run} disabled={state.busy} data-testid="run-ci-button" title={`Trigger CI: ${label}`}>
+      <Button size={size} variant={variant} onClick={run} disabled={state.busy} data-testid="run-ci-button" title={`Trigger CI: ${label}${headed ? ' (headed, via Xvfb)' : ''}`}>
         {state.busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
         {state.busy ? 'Triggering…' : buttonLabel}
       </Button>

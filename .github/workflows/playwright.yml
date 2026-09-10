@@ -15,6 +15,11 @@ on:
         description: 'Title/tag pattern to filter tests (passed to --grep). Leave empty to run everything (or use test_file instead).'
         required: false
         type: string
+      headed:
+        description: 'Run with a real (headed) browser instead of headless, via a virtual display (Xvfb).'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   test:
@@ -38,17 +43,27 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Install Xvfb (for headed runs)
+        if: inputs.headed == true
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
       - name: Run Playwright tests
         env:
           TEST_FILE: ${{ inputs.test_file }}
           GREP: ${{ inputs.grep }}
+          HEADED: ${{ inputs.headed }}
         run: |
-          if [ -n "$TEST_FILE" ]; then
-            npx playwright test "$TEST_FILE"
-          elif [ -n "$GREP" ]; then
-            npx playwright test --grep "$GREP"
+          if [ "$HEADED" = "true" ]; then
+            RUNNER="xvfb-run -a"
           else
-            npm test
+            RUNNER=""
+          fi
+          if [ -n "$TEST_FILE" ]; then
+            $RUNNER npx playwright test "$TEST_FILE"
+          elif [ -n "$GREP" ]; then
+            $RUNNER npx playwright test --grep "$GREP"
+          else
+            $RUNNER npm test
           fi
 
       - name: Upload HTML report

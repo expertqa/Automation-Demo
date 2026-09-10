@@ -85,6 +85,7 @@ export function TestExecutionPage() {
         actions={
           <>
             <RunCiButton grep={test.title} label={`${test.title} only`} buttonLabel="Trigger CI" />
+            <RunCiButton grep={test.title} label={`${test.title} only`} headed buttonLabel="Trigger CI (headed)" />
             <ExternalButton href={links.sourceUrl} icon={<Github className="h-3.5 w-3.5" />} label="View Source on GitHub" primary testId="view-source" />
             <ExternalButton href={links.commitUrl} icon={<GitCommit className="h-3.5 w-3.5" />} label="View Commit" />
             <ExternalButton href={links.ciRunUrl} icon={<Workflow className="h-3.5 w-3.5" />} label="View CI Run" />
