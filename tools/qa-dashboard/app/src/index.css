@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 240 6% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 94%;
+    --accent-foreground: 240 6% 10%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 240 5% 65%;
+    --radius: 0.5rem;
+
+    --status-passed: 152 60% 38%;
+    --status-failed: 0 72% 51%;
+    --status-flaky: 38 92% 45%;
+    --status-skipped: 240 5% 58%;
+    --chart-grid: 240 6% 90%;
+    --chart-accent: 221 83% 53%;
+  }
+
+  .dark {
+    --background: 240 10% 5%;
+    --foreground: 0 0% 96%;
+    --card: 240 8% 8%;
+    --card-foreground: 0 0% 96%;
+    --popover: 240 8% 8%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 240 6% 10%;
+    --secondary: 240 5% 14%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 240 5% 14%;
+    --muted-foreground: 240 5% 62%;
+    --accent: 240 5% 16%;
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 63% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5% 17%;
+    --input: 240 5% 17%;
+    --ring: 240 5% 45%;
+
+    --status-passed: 152 55% 48%;
+    --status-failed: 0 78% 62%;
+    --status-flaky: 40 92% 58%;
+    --status-skipped: 240 5% 55%;
+    --chart-grid: 240 5% 17%;
+    --chart-accent: 217 91% 65%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-background text-foreground font-sans text-[13.5px] leading-normal;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+  }
+  ::selection {
+    @apply bg-primary/15;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+/* Recharts base tweaks */
+.recharts-cartesian-grid line {
+  stroke: hsl(var(--chart-grid));
+}
+.recharts-tooltip-cursor {
+  fill: hsl(var(--accent)) !important;
+  opacity: 0.6;
+}
+.recharts-default-tooltip {
+  background: hsl(var(--popover)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 6px;
+  font-size: 12px;
+}

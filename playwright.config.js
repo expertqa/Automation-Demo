@@ -30,6 +30,11 @@ export default defineConfig({
   reporter: [
     ['html'],
     ['junit', { outputFile: 'test-results/junit.xml' }],
+    /* QA Dashboard (tools/qa-dashboard): records every run locally, or writes a
+       portable result package on CI. Runs alongside the reporters above.
+       mode: 'auto' → local ingest on a dev machine, package on CI.
+       Override with QA_DASHBOARD_MODE=local|package|off. */
+    ['./tools/qa-dashboard/reporter/index.ts', { mode: 'auto', environment: process.env.QA_DASHBOARD_ENV || 'qa' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -49,9 +54,11 @@ export default defineConfig({
     /* Every test starts with the authenticated state produced by globalSetup. */
     storageState: 'state.json',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    /* Artifacts feed the QA Dashboard failure view. Kept only for failures so
+       passing runs stay lean. See https://playwright.dev/docs/trace-viewer */
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */

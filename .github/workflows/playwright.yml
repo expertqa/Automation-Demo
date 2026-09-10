@@ -5,11 +5,17 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
     timeout-minutes: 30
     runs-on: ubuntu-latest
+    env:
+      # QA Dashboard reporter: on CI it writes a portable result package instead of
+      # touching a local database (mode "auto" → package when CI=true).
+      QA_DASHBOARD_MODE: package
+      QA_DASHBOARD_ENV: qa
     steps:
       - uses: actions/checkout@v7
 
@@ -33,3 +39,38 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 10
+
+      # Portable QA Dashboard package (results.json + screenshots/videos/traces).
+      # Download it from the workflow run and import locally with:
+      #   npm run dashboard ./playwright-dashboard-results.zip
+      - name: Upload QA Dashboard result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-dashboard-results
+          path: playwright-dashboard-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+  # Guards the dashboard itself (unit + UI tests) whenever it changes.
+  dashboard:
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Install dashboard dependencies
+        run: npm ci
+        working-directory: tools/qa-dashboard
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: tools/qa-dashboard
+      - name: Typecheck, lint, unit tests
+        run: npm run typecheck && npm run lint && npm test
+        working-directory: tools/qa-dashboard
+      - name: Build UI and run dashboard UI tests
+        run: npm run build && npm run test:e2e
+        working-directory: tools/qa-dashboard

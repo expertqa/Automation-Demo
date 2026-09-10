@@ -6,7 +6,15 @@
   "scripts": {
     "test": "playwright test",
     "test:list": "playwright test --list",
-    "test:headed": "playwright test --headed"
+    "test:headed": "playwright test --headed",
+    "dashboard": "node tools/qa-dashboard/bin/qa-dashboard.js",
+    "dashboard:import": "node tools/qa-dashboard/bin/qa-dashboard.js import",
+    "dashboard:seed": "node tools/qa-dashboard/bin/qa-dashboard.js seed",
+    "dashboard:reset": "node tools/qa-dashboard/bin/qa-dashboard.js reset --yes",
+    "dashboard:package": "node tools/qa-dashboard/bin/qa-dashboard.js package",
+    "dashboard:install": "npm install --prefix tools/qa-dashboard",
+    "dashboard:dev": "npm run dev --prefix tools/qa-dashboard",
+    "dashboard:test": "npm run typecheck --prefix tools/qa-dashboard && npm run lint --prefix tools/qa-dashboard && npm test --prefix tools/qa-dashboard && npm run build --prefix tools/qa-dashboard && npm run test:e2e --prefix tools/qa-dashboard"
   },
   "keywords": [],
   "author": "",

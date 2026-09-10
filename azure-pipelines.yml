@@ -33,6 +33,10 @@ steps:
 
   - script: npm test
     displayName: 'Run Playwright tests'
+    env:
+      # QA Dashboard reporter writes a portable result package on CI.
+      QA_DASHBOARD_MODE: package
+      QA_DASHBOARD_ENV: qa
 
   - task: PublishTestResults@2
     condition: always()
@@ -48,3 +52,12 @@ steps:
       targetPath: 'playwright-report'
       artifact: 'playwright-report'
     displayName: 'Publish HTML report'
+
+  # Portable QA Dashboard package — download and import locally with:
+  #   npm run dashboard ./playwright-dashboard-results.zip
+  - task: PublishPipelineArtifact@1
+    condition: always()
+    inputs:
+      targetPath: 'playwright-dashboard-results'
+      artifact: 'playwright-dashboard-results'
+    displayName: 'Publish QA Dashboard result package'
