@@ -35,6 +35,12 @@ export default defineConfig({
        mode: 'auto' → local ingest on a dev machine, package on CI.
        Override with QA_DASHBOARD_MODE=local|package|off. */
     ['./tools/qa-dashboard/reporter/index.ts', { mode: 'auto', environment: process.env.QA_DASHBOARD_ENV || 'qa' }],
+    /* QA Dashboard v1.5 (developed in its own separate repo, qa-sonic-dashboard — live
+       preview + auth): this bridge reporter is the one piece that has to live here since
+       it runs inside the actual test process. Always writes its own package (distinct
+       name/dir from v1's, so they never collide); progress callbacks are a no-op unless
+       DASHBOARD_RUN_ID/TOKEN/INGEST_URL are set by a v1.5-triggered CI run. */
+    ['./reporter-v1.5/index.ts', { environment: process.env.QA_DASHBOARD_ENV || 'qa', packageDir: 'playwright-dashboard-results-v15' }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

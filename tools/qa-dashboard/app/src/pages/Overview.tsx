@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { RunsTable } from '@/pages/Runs';
 import { RunCiButton } from '@/components/RunCiButton';
+import { SyncCiButton } from '@/components/SyncCiButton';
 import { useOverview } from '@/lib/api';
 import { useScope } from '@/hooks/useScope';
 import { formatDuration, formatPercent, shortSha, timeAgo } from '@/lib/utils';
@@ -25,13 +26,13 @@ export function OverviewPage() {
   if (!latest) {
     return (
       <>
-        <PageHeader title="Overview" description="Executive view of your Playwright automation." />
+        <PageHeader title="Overview" description="Executive view of your Playwright automation." actions={<SyncCiButton />} />
         <EmptyState
           title="No test runs yet"
           description={
             <>
-              Run <code className="rounded bg-muted px-1">npm test</code> to record a local run, import a CI package with{' '}
-              <code className="rounded bg-muted px-1">npm run dashboard:import -- &lt;path&gt;</code>, or load demo data with{' '}
+              Run <code className="rounded bg-muted px-1">npm test</code> to record a local run, trigger CI and click{' '}
+              <code className="rounded bg-muted px-1">Sync CI results</code> above once it finishes, or load demo data with{' '}
               <code className="rounded bg-muted px-1">npm run dashboard:seed</code>.
             </>
           }
@@ -61,6 +62,7 @@ export function OverviewPage() {
           <>
             <RunCiButton label="Full Suite" buttonLabel="Run full suite" />
             <RunCiButton label="Full Suite" headed buttonLabel="Run full suite (headed)" />
+            <SyncCiButton />
             <Link to={`/runs/${latest.id}`} className="inline-flex items-center gap-1 text-[13px] text-muted-foreground hover:text-foreground">
               Open latest run <ArrowRight className="h-3.5 w-3.5" />
             </Link>

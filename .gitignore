@@ -2,6 +2,7 @@
 # OS / editor
 .DS_Store
 .vscode/
+.claude/
 
 # Playwright
 node_modules/
@@ -20,6 +21,8 @@ funnelData.json
 /dashboard-data/
 /playwright-dashboard-results/
 /playwright-dashboard-results.zip
+/playwright-dashboard-results-v15/
+/playwright-dashboard-results-v15.zip
 tools/qa-dashboard/node_modules/
 tools/qa-dashboard/app/dist/
 tools/qa-dashboard/fixtures/.dashboard-data/
@@ -27,3 +30,10 @@ tools/qa-dashboard/fixtures/.test-results/
 tools/qa-dashboard/fixtures/.package/
 tools/qa-dashboard/tests/e2e/.data/
 tools/qa-dashboard/tests/e2e/.test-results/
+
+# QA Dashboard v1.5 (live preview + auth, in development) now lives in its own separate
+# repo (qa-sonic-dashboard, sibling to this one) — only its CI-side bridge pieces remain
+# here. It still resolves its data directory against *this* repo's root, though.
+/dashboard-data-v1.5/
+
+.env

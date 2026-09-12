@@ -91,3 +91,11 @@ export interface TriggerCiResponse {
 }
 export const triggerCi = (body: TriggerCiInput) => api<TriggerCiResponse>('/ci/run', { method: 'POST', body: JSON.stringify(body) });
 export const deleteDemoData = () => api<{ ok: boolean; removed: number }>('/demo-data', { method: 'DELETE' });
+
+export interface CiSyncResponse {
+  checked: number;
+  imported: { runId: string; ghRunId: number; passed: number; failed: number }[];
+  skippedNoArtifact: number[];
+  errors: { ghRunId: number; message: string }[];
+}
+export const syncCi = () => api<CiSyncResponse>('/ci/sync', { method: 'POST' });

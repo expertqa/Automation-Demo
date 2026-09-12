@@ -1,8 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
-
-const REPO = 'expertqa/Automation-Demo';
-const WORKFLOW_FILE = 'playwright.yml';
-const REF = 'main';
+import { CI_REF as REF, CI_REPO as REPO, CI_WORKFLOW_FILE as WORKFLOW_FILE } from '../services/ci-config';
+import { syncCiRuns } from '../services/ci-sync';
 
 interface RunCiBody {
   testFile?: string;
@@ -66,6 +64,27 @@ export const registerCiRoutes: FastifyPluginAsync = async (app) => {
     } catch (err) {
       ctx.logger.error(`GitHub dispatch request failed: ${(err as Error).message}`);
       return reply.code(502).send({ error: `Could not reach GitHub: ${(err as Error).message}` });
+    }
+  });
+
+  /**
+   * Pulls any finished GitHub Actions runs of the workflow into the local
+   * dashboard (same thing the background poller in server/index.ts does on a
+   * timer). Exposed so the UI can force an immediate refresh after triggering
+   * a run instead of waiting for the next timer tick.
+   */
+  app.post('/sync', async (_req, reply) => {
+    const token = process.env.GITHUB_TOKEN;
+    if (!token) {
+      return reply.code(400).send({
+        error: 'GITHUB_TOKEN not configured — see README (## CI triggers) for the required PAT scopes and where to create one.',
+      });
+    }
+    try {
+      return await syncCiRuns(ctx);
+    } catch (err) {
+      ctx.logger.error(`ci sync failed: ${(err as Error).message}`);
+      return reply.code(502).send({ error: (err as Error).message });
     }
   });
 };

@@ -20,6 +20,18 @@ on:
         required: false
         type: boolean
         default: false
+      dashboard_run_id:
+        description: 'Internal — QA Dashboard run id for live-preview correlation. Set automatically when triggered from the dashboard; leave empty otherwise.'
+        required: false
+        type: string
+      dashboard_run_token:
+        description: 'Internal — short-lived QA Dashboard ingestion token. Masked immediately; never use manually.'
+        required: false
+        type: string
+      dashboard_ingest_url:
+        description: 'Internal — QA Dashboard live-preview ingestion base URL. Set automatically when triggered from the dashboard.'
+        required: false
+        type: string
 
 jobs:
   test:
@@ -31,6 +43,12 @@ jobs:
       QA_DASHBOARD_MODE: package
       QA_DASHBOARD_ENV: qa
     steps:
+      # Mask the ingestion token before anything else can echo it into the log,
+      # and no-op harmlessly on a plain push/PR run where it's empty.
+      - name: Mask QA Dashboard ingestion token
+        if: inputs.dashboard_run_token != ''
+        run: echo "::add-mask::${{ inputs.dashboard_run_token }}"
+
       - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v7
@@ -47,11 +65,31 @@ jobs:
         if: inputs.headed == true
         run: sudo apt-get update && sudo apt-get install -y xvfb
 
+      # Tells the QA Dashboard this GitHub Actions run id belongs to its dashboard_run_id,
+      # ahead of the periodic result-sync poll, and flips the run out of "queued" so the
+      # dashboard UI can show progress while the browser is still starting up.
+      - name: Report CI start to QA Dashboard
+        if: inputs.dashboard_run_id != ''
+        continue-on-error: true
+        env:
+          DASHBOARD_RUN_ID: ${{ inputs.dashboard_run_id }}
+          DASHBOARD_RUN_TOKEN: ${{ inputs.dashboard_run_token }}
+          DASHBOARD_INGEST_URL: ${{ inputs.dashboard_ingest_url }}
+        run: |
+          curl -sf -m 10 -X POST "$DASHBOARD_INGEST_URL/$DASHBOARD_RUN_ID/status" \
+            -H "Authorization: Bearer $DASHBOARD_RUN_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\":\"ci-running\",\"githubRunId\":\"${{ github.run_id }}\",\"actionsUrl\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" \
+            || echo "QA Dashboard unreachable from this runner (e.g. a local-only dashboard) — continuing without live preview."
+
       - name: Run Playwright tests
         env:
           TEST_FILE: ${{ inputs.test_file }}
           GREP: ${{ inputs.grep }}
           HEADED: ${{ inputs.headed }}
+          DASHBOARD_RUN_ID: ${{ inputs.dashboard_run_id }}
+          DASHBOARD_RUN_TOKEN: ${{ inputs.dashboard_run_token }}
+          DASHBOARD_INGEST_URL: ${{ inputs.dashboard_ingest_url }}
         run: |
           if [ "$HEADED" = "true" ]; then
             RUNNER="xvfb-run -a"
@@ -65,6 +103,26 @@ jobs:
           else
             $RUNNER npm test
           fi
+
+      # Best-effort final status so the dashboard's "Execution completed" shows up
+      # immediately rather than waiting for the next ~20s result-sync poll.
+      - name: Report completion to QA Dashboard
+        if: always() && inputs.dashboard_run_id != ''
+        continue-on-error: true
+        env:
+          DASHBOARD_RUN_ID: ${{ inputs.dashboard_run_id }}
+          DASHBOARD_RUN_TOKEN: ${{ inputs.dashboard_run_token }}
+          DASHBOARD_INGEST_URL: ${{ inputs.dashboard_ingest_url }}
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          MAPPED="failed"
+          if [ "$JOB_STATUS" = "success" ]; then MAPPED="passed"; fi
+          if [ "$JOB_STATUS" = "cancelled" ]; then MAPPED="cancelled"; fi
+          curl -sf -m 10 -X POST "$DASHBOARD_INGEST_URL/$DASHBOARD_RUN_ID/status" \
+            -H "Authorization: Bearer $DASHBOARD_RUN_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"status\":\"$MAPPED\"}" \
+            || echo "QA Dashboard unreachable — the periodic result-sync poll will still pick up the final result."
 
       - name: Upload HTML report
         if: always()
@@ -83,6 +141,17 @@ jobs:
         with:
           name: playwright-dashboard-results
           path: playwright-dashboard-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+      # QA Dashboard v1.5 (live preview + auth, in development) — separate reporter instance,
+      # separate package dir/artifact name so it never collides with the v1 upload above.
+      - name: Upload QA Dashboard v1.5 result package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-dashboard-results-v15
+          path: playwright-dashboard-results-v15/
           if-no-files-found: warn
           retention-days: 30
 

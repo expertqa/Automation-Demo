@@ -1,5 +1,5 @@
 // fixtures/rateLimitFixture.js
-import { test as base, expect } from "@playwright/test";
+import { test as base, expect } from "./dashboardFixtures";
 
 const MAX_RATE_LIMIT_ATTEMPTS = 5;
 // Flat, generous wait per your call — no rush, just needs to survive.
